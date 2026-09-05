@@ -1,4 +1,6 @@
 import datetime
+import random
+import time
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -11,7 +13,7 @@ class OtomotoScraper:
     LOCATION_ID = "ooa-1nqstmz"
 
     def __init__(self, url: str = None, test_mode: bool = False, test_url: str = None):
-        self.url = url
+        self.first_page_url = url  # first page of search results
         self.test_mode = test_mode
         self.test_url = test_url
 
@@ -19,8 +21,10 @@ class OtomotoScraper:
 
         self.listings: list[SearchAdvertData] = []
 
+
     def get_url_for_given_page_number(self, page_number: int):
-        return f"{self.url}?page={page_number}"
+        return f"{self.first_page_url}?page={page_number}"
+
 
     def get_last_page_number(self, soup: BeautifulSoup | Tag):
         """Finds the highest pagination page number and sets self.last_page_number."""
@@ -34,7 +38,7 @@ class OtomotoScraper:
 
         self.last_page_number = max(page_numbers) if page_numbers else None
 
-    # @staticmethod
+
     def get_parsed_html(self, url: str) -> BeautifulSoup:
         """
         Downloads raw HTML content from the given URL and returns a BeautifulSoup object.
@@ -54,17 +58,28 @@ class OtomotoScraper:
 
         return soup_doc
 
-    @staticmethod
-    def get_search_results_from_one_page(soup: BeautifulSoup | Tag):
-        """Extracts the main search results container (div[data-testid='search-results']) from the page."""
-        search_results = soup.find("div", {"data-testid": "search-results"})
-        return search_results
 
-    def scrape_first_search_page_and_get_last_page_num(self):
-        """Fetches the first page, scrapes its items, and sets self.last_page_number."""
-        soup_doc = self.get_parsed_html(self.url)  # REQUEST!
-        self.scrape_one_page_of_search_results(self.get_search_results_from_one_page(soup_doc))
-        self.get_last_page_number(soup_doc)
+    def initialize_search_scraping(self, url, fetch_last_page_num: bool = False) -> None:
+        """Fetches and scrapes a single search results page.
+
+        Args:
+            url: The target page URL to fetch and process.
+            fetch_last_page_num: If True, extracts the total page count
+                from the response and updates self.last_page_number.
+
+        Side Effects:
+            Appends parsed items to the internal storage.
+            Optionally updates self.last_page_number.
+        """
+        soup_doc = self.get_parsed_html(url)  # MAKE A REQUEST!
+
+        # Extracts the main search results container (div[data-testid='search-results']) from the page.
+        search_results = soup_doc.find("div", {"data-testid": "search-results"})
+        self.scrape_one_page_of_search_results(search_results)
+
+        if fetch_last_page_num:
+            self.get_last_page_number(soup_doc)
+
 
     def scrape_single_search_item(self, article: Tag) -> SearchAdvertData:
         """Extracts required data fields from a single search result article tag."""
@@ -98,10 +113,17 @@ class OtomotoScraper:
             single_advert_data = self.scrape_single_search_item(article)
             self.listings.append(single_advert_data)
 
+
     def scrape_all_pages_of_search_results(self):
         """Iterates through all search pages from 2 to self.last_page_number and scrapes their contents."""
-        pass
+        if not self.last_page_number:
+            return
+
+        for page_number in range(2, self.last_page_number + 1):
+            time.sleep(random.randint(3, 10)) # Random pause between requests
+            page_url = self.get_url_for_given_page_number(page_number)
+
 
     def light_crawl(self):
         """Goes over search pages and collects general listings data"""
-        self.scrape_first_search_page_and_get_last_page_num()
+        self.initialize_search_scraping(self.first_page_url, True)
