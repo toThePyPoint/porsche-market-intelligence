@@ -8,6 +8,7 @@ from data_model import SearchAdvertData, AdvertDetails
 class OtomotoScraper:
     LAST_ITEMS_ID = "ooa-13ptg7a"
     DESCRIPTION_ELEMENT_ID = "e1kj25my0.ooa-nxfgg7"
+    LOCATION_ID = "ooa-1nqstmz"
 
     def __init__(self, url: str = None, test_mode: bool = False, test_url: str = None):
         self.url = url
@@ -76,7 +77,18 @@ class OtomotoScraper:
         description_element = article.select_one(f"p.{self.DESCRIPTION_ELEMENT_ID}")
         description = description_element.get_text(strip=True)
 
-        return SearchAdvertData(advert_id=advert_id, title=title, url=url, description=description)
+        price_element = article.find("h3")
+        price = int(price_element.get_text(strip=True).replace(" ", ""))
+
+        currency_element = price_element.find_next("p", translate="no")
+        currency = currency_element.get_text(strip=True)
+
+        location_element = article.find("p", class_=self.LOCATION_ID)
+        location = location_element.get_text(strip=True)
+        city, province = location.replace(")", "").split(" (")
+
+        return SearchAdvertData(advert_id=advert_id, title=title, url=url, description=description,
+                                price=price, currency=currency, city=city, province=province)
 
 
     def scrape_one_page_of_search_results(self, search_results: Tag):

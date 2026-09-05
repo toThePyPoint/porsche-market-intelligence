@@ -12,12 +12,8 @@ class SearchAdvertData:
     price: int | None
     currency: str | None
 
-    year: int | None
-    mileage: int | None
-
-    city: str | None
     province: str | None
-
+    city: str | None
 
 
 @dataclass
@@ -26,3 +22,7 @@ class AdvertDetails:
 
     engine_size_cm3: int | None
     engine_power_hp: int | None
+
+    # year: int | None
+    # mileage: int | None
+    #
