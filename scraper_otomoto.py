@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup, Tag
+from data_model import SearchAdvertData, AdvertDetails
 
 
 class OtomotoScraper:
@@ -9,6 +10,8 @@ class OtomotoScraper:
     def __init__(self, url: str):
         self.url = url
         self.last_page_number = None
+
+        self.listings = list[SearchAdvertData]
 
     def get_url_for_given_page_number(self, page_number: int):
         return f"{self.url}?page={page_number}"
