@@ -19,19 +19,27 @@ class OtomotoScraper:
         "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36"
     }
 
-    def __init__(self, url: str = None, test_mode: bool = False, test_url: str = None):
+    def __init__(self, url: str = None, test_mode: bool = False, pages_limit: int = None):
         self.first_page_url = url  # first page of search results
         self.test_mode = test_mode
-        self.test_url = test_url
+        self.pages_limit = pages_limit
 
         self.last_page_number = None
-        self.first_page_soup_doc = None
-
         self.listings: list[SearchAdvertData] = []
 
+        self.set_test_mode()
+
+    def set_test_mode(self):
+        """Sets class into testing mode. Testing mode gets HTML files from hard drive."""
+        if self.test_mode:
+            self.first_page_url = "html-files/preview.html"
+            self.last_page_number = 3
 
     def get_url_for_given_page_number(self, page_number: int):
         return f"{self.first_page_url}?page={page_number}"
+
+    def get_test_path_for_given_page_number(self, page_number: int):
+        return self.first_page_url.replace(".html", str(f"_page{page_number}.html"))
 
 
     def get_last_page_number(self, soup: BeautifulSoup | Tag):
@@ -44,7 +52,8 @@ class OtomotoScraper:
             if item.get_text(strip=True).isdigit()
         ]
 
-        self.last_page_number = max(page_numbers) if page_numbers else None
+        if not self.test_mode:
+            self.last_page_number = max(page_numbers) if page_numbers else None
 
 
     def get_parsed_html(self, url: str) -> BeautifulSoup:
@@ -55,7 +64,8 @@ class OtomotoScraper:
 
         if self.test_mode:
             print("Testing mode — retrieving data from hard drive")
-            with open(self.test_url, "r", encoding="utf-8") as f:
+            print(f"Path: {url}")
+            with open(url, "r", encoding="utf-8") as f:
                 html = f.read()
         else:
             print(f"Downloading {url}")
@@ -79,14 +89,14 @@ class OtomotoScraper:
             Appends parsed items to the internal storage.
             Optionally updates self.last_page_number.
         """
-        self.first_page_soup_doc = self.get_parsed_html(url)  # MAKE A REQUEST!
+        soup_doc = self.get_parsed_html(url)  # MAKE A REQUEST!
 
         # Extracts the main search results container (div[data-testid='search-results']) from the page.
-        search_results = self.first_page_soup_doc.find("div", {"data-testid": "search-results"})
+        search_results = soup_doc.find("div", {"data-testid": "search-results"})
         self.scrape_one_page_of_search_results(search_results)
 
         if fetch_last_page_num:
-            self.get_last_page_number(self.first_page_soup_doc)
+            self.get_last_page_number(soup_doc)
 
 
     def scrape_single_search_item(self, article: Tag) -> SearchAdvertData:
@@ -127,13 +137,24 @@ class OtomotoScraper:
         if not self.last_page_number:
             return
 
-        # TODO: Implement test mode
         for page_number in range(2, self.last_page_number + 1):
-            time.sleep(random.randint(3, 10)) # Random pause between requests
-            page_url = self.get_url_for_given_page_number(page_number)
+            pause = random.randint(100, 1000) / 100
+            time.sleep(pause) # Random pause between requests
+            print(f"Pause: {pause}")
+            print("Scraping page " + str(page_number))
+            if self.test_mode:
+                page_url = self.get_test_path_for_given_page_number(page_number)
+            else:
+                page_url = self.get_url_for_given_page_number(page_number)
             self.initialize_search_scraping(page_url)
+
+            if self.pages_limit:
+                if page_number == self.pages_limit:
+                    print("Pages limit reached")
+                    break
 
 
     def light_crawl(self):
         """Goes over search pages and collects general listings data"""
         self.initialize_search_scraping(self.first_page_url, True)
+        self.scrape_all_pages_of_search_results()
