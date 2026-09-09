@@ -12,12 +12,20 @@ class OtomotoScraper:
     DESCRIPTION_ELEMENT_ID = "e1kj25my0.ooa-nxfgg7"
     LOCATION_ID = "ooa-1nqstmz"
 
+    HEADERS = {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
+        "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36"
+    }
+
     def __init__(self, url: str = None, test_mode: bool = False, test_url: str = None):
         self.first_page_url = url  # first page of search results
         self.test_mode = test_mode
         self.test_url = test_url
 
         self.last_page_number = None
+        self.first_page_soup_doc = None
 
         self.listings: list[SearchAdvertData] = []
 
@@ -52,7 +60,7 @@ class OtomotoScraper:
         else:
             print(f"Downloading {url}")
             print(f"Time: {datetime.datetime.now()}")
-            html = requests.get(url).text
+            html = requests.get(url, headers=self.HEADERS).text
 
         soup_doc = BeautifulSoup(html, 'html.parser')
 
@@ -71,14 +79,14 @@ class OtomotoScraper:
             Appends parsed items to the internal storage.
             Optionally updates self.last_page_number.
         """
-        soup_doc = self.get_parsed_html(url)  # MAKE A REQUEST!
+        self.first_page_soup_doc = self.get_parsed_html(url)  # MAKE A REQUEST!
 
         # Extracts the main search results container (div[data-testid='search-results']) from the page.
-        search_results = soup_doc.find("div", {"data-testid": "search-results"})
+        search_results = self.first_page_soup_doc.find("div", {"data-testid": "search-results"})
         self.scrape_one_page_of_search_results(search_results)
 
         if fetch_last_page_num:
-            self.get_last_page_number(soup_doc)
+            self.get_last_page_number(self.first_page_soup_doc)
 
 
     def scrape_single_search_item(self, article: Tag) -> SearchAdvertData:
@@ -119,9 +127,11 @@ class OtomotoScraper:
         if not self.last_page_number:
             return
 
+        # TODO: Implement test mode
         for page_number in range(2, self.last_page_number + 1):
             time.sleep(random.randint(3, 10)) # Random pause between requests
             page_url = self.get_url_for_given_page_number(page_number)
+            self.initialize_search_scraping(page_url)
 
 
     def light_crawl(self):
