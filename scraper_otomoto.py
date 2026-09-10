@@ -121,7 +121,8 @@ class OtomotoScraper:
         city, province = location.replace(")", "").split(" (")
 
         return SearchAdvertData(advert_id=advert_id, title=title, url=url, description=description,
-                                price=price, currency=currency, city=city, province=province)
+                                price=price, currency=currency, city=city, province=province,
+                                scraped_at=datetime.datetime.now())
 
 
     def scrape_one_page_of_search_results(self, search_results: Tag):

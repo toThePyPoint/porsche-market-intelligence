@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass
 
 
@@ -14,6 +15,8 @@ class SearchAdvertData:
 
     province: str | None
     city: str | None
+
+    scraped_at: datetime.datetime | None
 
 
 @dataclass
