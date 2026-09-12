@@ -219,3 +219,6 @@ __marimo__/
 
 html-files
 notebook-html-test.ipynb
+notebook-database-test.ipynb
+data
+*.db

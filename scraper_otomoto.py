@@ -4,12 +4,12 @@ import time
 
 import requests
 from bs4 import BeautifulSoup, Tag
-from data_model import SearchAdvertData, AdvertDetails
+from data_model import SearchAdvertData, AdvertProcessingData, AdvertDetails
 
 
 class OtomotoScraper:
     LAST_ITEMS_ID = "ooa-13ptg7a"
-    DESCRIPTION_ELEMENT_ID = "e1kj25my0.ooa-nxfgg7"
+    SHORT_DESCRIPTION_ELEMENT_ID = "e1kj25my0.ooa-nxfgg7"
     LOCATION_ID = "ooa-1nqstmz"
 
     HEADERS = {
@@ -25,7 +25,9 @@ class OtomotoScraper:
         self.pages_limit = pages_limit
 
         self.last_page_number = None
-        self.listings: list[SearchAdvertData] = []
+        self.searched_listings: list[SearchAdvertData] = []
+        self.listings_processed_info: list[AdvertProcessingData] = []
+        self.advert_details: list[AdvertDetails] = []
 
         self.set_test_mode()
 
@@ -99,7 +101,7 @@ class OtomotoScraper:
             self.get_last_page_number(soup_doc)
 
 
-    def scrape_single_search_item(self, article: Tag) -> SearchAdvertData:
+    def scrape_single_search_item(self, article: Tag) -> tuple[SearchAdvertData, AdvertProcessingData]:
         """Extracts required data fields from a single search result article tag."""
         advert_id = article.get("data-id")
 
@@ -107,8 +109,8 @@ class OtomotoScraper:
         title = title_element.get_text(strip=True)
         url = title_element.get("href")
 
-        description_element = article.select_one(f"p.{self.DESCRIPTION_ELEMENT_ID}")
-        description = description_element.get_text(strip=True)
+        short_description_element = article.select_one(f"p.{self.SHORT_DESCRIPTION_ELEMENT_ID}")
+        description = short_description_element.get_text(strip=True)
 
         price_element = article.find("h3")
         price = int(price_element.get_text(strip=True).replace(" ", ""))
@@ -120,17 +122,18 @@ class OtomotoScraper:
         location = location_element.get_text(strip=True)
         city, province = location.replace(")", "").split(" (")
 
-        return SearchAdvertData(advert_id=advert_id, title=title, url=url, description=description,
-                                price=price, currency=currency, city=city, province=province,
-                                scraped_at=datetime.datetime.now())
+        return (SearchAdvertData(advert_id=advert_id, title=title, url=url, short_description=description,
+                                price=price, currency=currency, scraped_at=datetime.datetime.now()),
+                AdvertProcessingData(advert_id=advert_id, city=city, province=province,))
 
 
     def scrape_one_page_of_search_results(self, search_results: Tag):
         """Finds all article items in the container and passes each to scrape_single_search_item."""
         articles = search_results.find_all("article", attrs={"data-id": True}, recursive=False)
         for article in articles:
-            single_advert_data = self.scrape_single_search_item(article)
-            self.listings.append(single_advert_data)
+            search_data, processing_data = self.scrape_single_search_item(article)
+            self.searched_listings.append(search_data)
+            self.listings_processed_info.append(processing_data)
 
 
     def scrape_all_pages_of_search_results(self):
@@ -139,10 +142,15 @@ class OtomotoScraper:
             return
 
         for page_number in range(2, self.last_page_number + 1):
-            pause = random.randint(100, 1000) / 100
+            if not self.test_mode:
+                pause = random.randint(100, 1000) / 100
+            else:
+                pause = 0.1
+
             time.sleep(pause) # Random pause between requests
             print(f"Pause: {pause}")
             print("Scraping page " + str(page_number))
+
             if self.test_mode:
                 page_url = self.get_test_path_for_given_page_number(page_number)
             else:

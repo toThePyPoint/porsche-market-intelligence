@@ -5,18 +5,24 @@ from dataclasses import dataclass
 @dataclass
 class SearchAdvertData:
     advert_id: str
-    url: str
 
     title: str
-    description: str | None
+    short_description: str | None
 
     price: int | None
     currency: str | None
 
+    scraped_at: datetime.datetime | None
+    url: str
+
+
+@dataclass
+class AdvertProcessingData:
+    """Advert details from light crawl"""
+    advert_id: str
+
     province: str | None
     city: str | None
-
-    scraped_at: datetime.datetime | None
 
 
 @dataclass

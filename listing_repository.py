@@ -1,4 +1,5 @@
 import sqlite3
+from dataclasses import astuple
 
 from data_model import SearchAdvertData
 
@@ -20,17 +21,30 @@ class ListingRepository:
         conn, cursor = self.set_connection()
         cursor.execute(
             '''CREATE TABLE IF NOT EXISTS listings_snapshots (
-                    advert_id TEXT UNIQUE NOT NULL,
-                    url TEXT NOT NULL,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    advert_id TEXT NOT NULL,
                     title TEXT NOT NULL,
-                    description TEXT NOT NULL,
+                    short_description TEXT NOT NULL,
                     price INTEGER NOT NULL,
                     currency TEXT NOT NULL,
-                    province TEXT NOT NULL,
-                    city TEXT NOT NULL,
-                    scraped_at DATETIME NOT NULL
+                    scraped_at DATETIME NOT NULL,
+                    url TEXT NOT NULL
                 )
             '''
+        )
+
+        conn.commit()
+        conn.close()
+
+    def insert_listings_to_db(self):
+        conn, cursor = self.set_connection()
+        cursor.executemany(
+            '''INSERT INTO listings_snapshots (
+            advert_id, title, short_description, price, currency, scraped_at, url
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''',
+            (astuple(item) for item in self.listings)
         )
 
         conn.commit()
