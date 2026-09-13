@@ -1,15 +1,15 @@
 import sqlite3
 from dataclasses import astuple
 
-from data_model import SearchAdvertData
+from data_model import SearchAdvertData, AdvertDetails
 
 
 class ListingRepository:
     SNAPSHOTS_TABLE_NAME = 'listings_snapshots'
     DETAILS_TABLE_NAME = 'listings_details'
 
-    def __init__(self, listings: list[SearchAdvertData], db_name: str):
-        self.searched_listings = listings
+    def __init__(self, db_name: str):
+        # self.searched_listings = listings
         self.db_name = db_name
 
     def set_connection(self):
@@ -37,11 +37,12 @@ class ListingRepository:
                 '''
             )
 
+            # TODO: reconsider NOT NULL constraint
             cursor.execute(
                 f'''CREATE TABLE IF NOT EXISTS {self.DETAILS_TABLE_NAME} (
                         advert_id TEXT PRIMARY KEY,
-                        city TEXT NOT NULL,
-                        province TEXT NOT NULL
+                        city TEXT,
+                        province TEXT
                     )
                 '''
             )
@@ -50,8 +51,8 @@ class ListingRepository:
         finally:
             conn.close()
 
-    def insert_listings_to_db(self):
-        """Inserts listings into database to table listings_snapshots."""
+    def insert_listings_to_db(self, listings: list[SearchAdvertData]):
+        """Inserts listings into database to table with listings snapshots."""
         conn, cursor = self.set_connection()
         try:
             cursor.executemany(
@@ -60,7 +61,24 @@ class ListingRepository:
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 ''',
-                (astuple(item) for item in self.searched_listings)
+                (astuple(item) for item in listings)
+            )
+
+            conn.commit()
+        finally:
+            conn.close()
+
+    def insert_adverts_details_to_db(self, advert_details: list[AdvertDetails]):
+        """Inserts listings into database to table with adverts details."""
+        conn, cursor = self.set_connection()
+        try:
+            cursor.executemany(
+                f'''INSERT INTO {self.DETAILS_TABLE_NAME} (
+                advert_id, province, city
+                )
+                VALUES (?, ?, ?)
+                ''',
+                (astuple(item) for item in advert_details)
             )
 
             conn.commit()

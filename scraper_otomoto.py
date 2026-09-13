@@ -43,6 +43,9 @@ class OtomotoScraper:
     def get_test_path_for_given_page_number(self, page_number: int):
         return self.first_page_url.replace(".html", str(f"_page{page_number}.html"))
 
+    @staticmethod
+    def get_single_advert_test_path(advert_id):
+        return f"html-files/advert_page_{advert_id}.html"
 
     def get_last_page_number(self, soup: BeautifulSoup | Tag):
         """Finds the highest pagination page number and sets self.last_page_number."""
@@ -57,6 +60,13 @@ class OtomotoScraper:
         if not self.test_mode:
             self.last_page_number = max(page_numbers) if page_numbers else None
 
+    def get_random_pause(self):
+        if not self.test_mode:
+            pause = random.randint(100, 1000) / 100
+        else:
+            pause = 0.1
+
+        return pause
 
     def get_parsed_html(self, url: str) -> BeautifulSoup:
         """
@@ -67,14 +77,22 @@ class OtomotoScraper:
         if self.test_mode:
             print("Testing mode — retrieving data from hard drive")
             print(f"Path: {url}")
-            with open(url, "r", encoding="utf-8") as f:
-                html = f.read()
+            path = url
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    html = f.read()
+            except FileNotFoundError:
+                print(f"Błąd: Plik '{path}' nie istnieje!")
+                html = None  # lub inna domyślna wartość / obsługa błędu
         else:
             print(f"Downloading {url}")
             print(f"Time: {datetime.datetime.now()}")
             html = requests.get(url, headers=self.HEADERS).text
 
-        soup_doc = BeautifulSoup(html, 'html.parser')
+        if html:
+            soup_doc = BeautifulSoup(html, 'html.parser')
+        else:
+            soup_doc = None
 
         return soup_doc
 
@@ -142,11 +160,7 @@ class OtomotoScraper:
             return
 
         for page_number in range(2, self.last_page_number + 1):
-            if not self.test_mode:
-                pause = random.randint(100, 1000) / 100
-            else:
-                pause = 0.1
-
+            pause = self.get_random_pause()
             time.sleep(pause) # Random pause between requests
             print(f"Pause: {pause}")
             print("Scraping page " + str(page_number))
@@ -163,7 +177,76 @@ class OtomotoScraper:
                     break
 
 
+    def scrape_one_advert_from_url(self, advert_id, data_from_light_crawl: dict) -> AdvertDetails:
+        if not self.test_mode:
+            url = data_from_light_crawl['url']
+        else:
+            url = self.get_single_advert_test_path(advert_id)
+
+        soup_doc = self.get_parsed_html(url)  # MAKE A REQUEST!
+
+        if not soup_doc:
+            # TODO: Fix that
+            # return AdvertDetails(advert_id=advert_id, engine_size_cm3=None, engine_power_hp=None, mileage=None,
+            #                  province=None, city=None)
+            return AdvertDetails(advert_id=advert_id, province=None, city=None)
+
+        # Find the section containing all main car details
+        details = soup_doc.find(
+            "div",
+            {"data-testid": "main-details-section"}
+        )
+
+        # Dictionary to store the extracted car details
+        car_details = {}
+
+        # Find each individual detail (e.g. mileage, fuel type, gearbox, etc.)
+        for detail in details.find_all(
+                "div",
+                {"data-testid": "detail"}
+        ):
+            # Each detail contains two <p> elements:
+            # the first one contains the value,
+            # the second one contains the name of the parameter
+            values = detail.find_all("p")
+
+            value = values[0].get_text(strip=True)
+            name = values[1].get_text(strip=True)
+
+            # Store the value using the parameter name as the dictionary key
+            car_details[name] = value
+
+        # Ensure the right format of the data
+        mileage = str(car_details.get("Przebieg"))[:-3].strip()
+        mileage_unit = str(car_details.get("Przebieg"))[-3:].strip()
+        fuel_type = car_details.get("Rodzaj paliwa")
+        gearbox = car_details.get("Skrzynia biegów")
+        body_type = car_details.get("Typ nadwozia")
+        engine_size = car_details.get("Pojemność skokowa").replace('cm3', '').replace(' ', '').strip()
+        power = car_details.get("Moc").replace('KM', '').replace(' ', '').strip()
+
+        # TODO: Fix that
+        # return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
+        #                      mileage_unit=mileage_unit, province=data_from_light_crawl['province'],
+        #                      city=data_from_light_crawl['city'], body_type=body_type, gearbox=gearbox,
+        #                      fuel_type=fuel_type)
+        #
+        return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
+                             city=data_from_light_crawl['city'])
+
+
     def light_crawl(self):
         """Goes over search pages and collects general listings data"""
         self.initialize_search_scraping(self.first_page_url, True)
         self.scrape_all_pages_of_search_results()
+
+    def heavy_crawl(self, new_adverts: dict):
+        """Goes over new adverts urls and collects details data"""
+        for advert_id, data in new_adverts.items():
+            pause = self.get_random_pause()
+            time.sleep(pause) # Random pause between requests
+            print(f"Pause: {pause}")
+            print("Scraping advert " + str(advert_id))
+
+            details = self.scrape_one_advert_from_url(advert_id=advert_id, data_from_light_crawl=data)
+            self.advert_details.append(details)

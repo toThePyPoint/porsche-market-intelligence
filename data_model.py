@@ -29,9 +29,17 @@ class AdvertProcessingData:
 class AdvertDetails:
     advert_id: str
 
-    engine_size_cm3: int | None
-    engine_power_hp: int | None
-
-    # year: int | None
-    # mileage: int | None
+    # Add units
+    # engine_size_cm3: str | None
+    # engine_power_hp: str | None
     #
+    # # year: int | None
+    # mileage: str | None
+    # mileage_unit: str | None
+
+    province: str | None
+    city: str | None
+
+    # body_type: str | None
+    # gearbox: str | None
+    # fuel_type: str | None
