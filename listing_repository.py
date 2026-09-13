@@ -51,6 +51,7 @@ class ListingRepository:
             conn.close()
 
     def insert_listings_to_db(self):
+        """Inserts listings into database to table listings_snapshots."""
         conn, cursor = self.set_connection()
         try:
             cursor.executemany(

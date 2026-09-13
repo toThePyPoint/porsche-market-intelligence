@@ -25,9 +25,9 @@ class OtomotoScraper:
         self.pages_limit = pages_limit
 
         self.last_page_number = None
-        self.searched_listings: list[SearchAdvertData] = []
-        self.listings_processed_info: list[AdvertProcessingData] = []
-        self.advert_details: list[AdvertDetails] = []
+        self.searched_listings: list[SearchAdvertData] = []  # general information retrieved within light crawl
+        self.listings_processed_info: list[AdvertProcessingData] = [] # details retrieved within light crawl
+        self.advert_details: list[AdvertDetails] = [] # details retrieved within heavy crawl
 
         self.set_test_mode()
 
