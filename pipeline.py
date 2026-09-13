@@ -1,4 +1,4 @@
-from data_model import SearchAdvertData
+from data_model import SearchAdvertData, AdvertProcessingData
 from listing_repository import ListingRepository
 from scraper_otomoto import OtomotoScraper
 
@@ -10,9 +10,30 @@ class ListingService:
         self.repo = None
         self.scraper = OtomotoScraper(test_mode=test_mode)
 
-    def identify_new_adverts(self):
-        """Identifies new adverts for which heavy crawl needs to be done."""
-        pass
+    @staticmethod
+    def identify_new_adverts(listings_processed_info: list[AdvertProcessingData],
+                             searched_listings: list[SearchAdvertData],
+                             adverts_in_db) -> dict:
+        """
+        Identifies new adverts for which heavy crawl needs to be done.
+        Returns dictionary {advert_id: (url, province, city)}
+        """
+        search_advert_list = [advert for advert in searched_listings if advert.advert_id not in adverts_in_db]
+        advert_processing_list = [advert for advert in listings_processed_info if advert.advert_id not in adverts_in_db]
+
+        details_map = {item.advert_id: item for item in advert_processing_list}
+
+        result = {
+            search_item.advert_id: (
+                search_item.url,
+                details_map[search_item.advert_id].province,
+                details_map[search_item.advert_id].city,
+            )
+            for search_item in search_advert_list
+            if search_item.advert_id in details_map
+        }
+
+        return result
 
     def process(self):
         """Main pipeline of gathering adverts."""
@@ -22,6 +43,12 @@ class ListingService:
         self.repo.create_tables()
         self.repo.insert_listings_to_db()
 
-        # TODO: Identify new adverts
+        # Identify new adverts
+        adverts_in_db = self.repo.get_all_adverts_from_table_with_details()
+
+        new_adverts = self.identify_new_adverts(self.scraper.listings_processed_info,
+                                                                          self.scraper.searched_listings,
+                                                                          adverts_in_db
+                                                                          )
 
         # TODO: Run Heavy crawling from scraper

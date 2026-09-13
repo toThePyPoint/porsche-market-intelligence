@@ -66,3 +66,15 @@ class ListingRepository:
             conn.commit()
         finally:
             conn.close()
+
+    def get_all_adverts_from_table_with_details(self) -> list:
+        """Gets all adverts ids from table with details."""
+        conn, cursor = self.set_connection()
+        try:
+            cursor.execute(f"SELECT advert_id FROM {self.DETAILS_TABLE_NAME}")
+            rows = cursor.fetchall()
+            advert_ids = [row[0] for row in rows] # convert to Python list
+        finally:
+            conn.close()
+
+        return advert_ids
