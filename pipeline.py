@@ -4,11 +4,10 @@ from scraper_otomoto import OtomotoScraper
 
 
 class ListingService:
-    DB_NAME = 'test_db.db'
-
-    def __init__(self, test_mode = False):
+    def __init__(self, url: str = None, test_mode: bool = False, pages_limit: int = None, db_name: str = "test_db.db"):
+        self.db_name = db_name
         self.repo = None
-        self.scraper = OtomotoScraper(test_mode=test_mode)
+        self.scraper = OtomotoScraper(url=url, test_mode=test_mode, pages_limit=pages_limit)
 
     @staticmethod
     def identify_new_adverts(listings_processed_info: list[AdvertProcessingData],
@@ -39,7 +38,7 @@ class ListingService:
         """Main pipeline of gathering adverts."""
         self.scraper.light_crawl()
 
-        self.repo = ListingRepository(self.DB_NAME)
+        self.repo = ListingRepository(self.db_name)
         self.repo.create_tables()
         self.repo.insert_listings_to_db(self.scraper.searched_listings)
 
