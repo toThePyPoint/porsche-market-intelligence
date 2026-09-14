@@ -30,16 +30,22 @@ class AdvertDetails:
     advert_id: str
 
     # Add units
-    # engine_size_cm3: str | None
-    # engine_power_hp: str | None
-    #
-    # # year: int | None
-    # mileage: str | None
-    # mileage_unit: str | None
+    engine_size_cm3: str | None
+    engine_power_hp: str | None
+
+    year: int | None
+    mileage: str | None
+    mileage_unit: str | None
 
     province: str | None
     city: str | None
 
-    # body_type: str | None
-    # gearbox: str | None
-    # fuel_type: str | None
+    body_type: str | None
+    gearbox: str | None
+    fuel_type: str | None
+
+    make: str | None
+    model: str | None
+    version: str | None
+    generation: str | None
+    drive_type: str | None

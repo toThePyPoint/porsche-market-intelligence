@@ -178,6 +178,11 @@ class OtomotoScraper:
 
 
     def scrape_one_advert_from_url(self, advert_id, data_from_light_crawl: dict) -> AdvertDetails:
+
+        def get_detail(doc, test_id):
+            element = doc.find(attrs={"data-testid": test_id})
+            return element.find_all("p")[-1].get_text(strip=True)
+
         if not self.test_mode:
             url = data_from_light_crawl['url']
         else:
@@ -187,12 +192,28 @@ class OtomotoScraper:
 
         if not soup_doc:
             # TODO: Fix that
-            # return AdvertDetails(advert_id=advert_id, engine_size_cm3=None, engine_power_hp=None, mileage=None,
-            #                  province=None, city=None)
-            return AdvertDetails(advert_id=advert_id, province=None, city=None)
+            return AdvertDetails(
+                advert_id=advert_id,
+                engine_size_cm3=None,
+                engine_power_hp=None,
+                year=None,
+                mileage=None,
+                mileage_unit=None,
+                province=None,
+                city=None,
+                body_type=None,
+                gearbox=None,
+                fuel_type=None,
+                make=None,
+                model=None,
+                version=None,
+                generation=None,
+                drive_type=None,
+            )
+            # return AdvertDetails(advert_id=advert_id, province=None, city=None)
 
         # Find the section containing all main car details
-        details = soup_doc.find(
+        main_details = soup_doc.find(
             "div",
             {"data-testid": "main-details-section"}
         )
@@ -201,7 +222,7 @@ class OtomotoScraper:
         car_details = {}
 
         # Find each individual detail (e.g. mileage, fuel type, gearbox, etc.)
-        for detail in details.find_all(
+        for detail in main_details.find_all(
                 "div",
                 {"data-testid": "detail"}
         ):
@@ -225,14 +246,37 @@ class OtomotoScraper:
         engine_size = car_details.get("Pojemność skokowa").replace('cm3', '').replace(' ', '').strip()
         power = car_details.get("Moc").replace('KM', '').replace(' ', '').strip()
 
+        # Section with details underneath
+        combined_details_section = soup_doc.find(
+            "div",
+            attrs={"data-testid": "combined-details-and-equipment-section"}
+        )
+
+        if combined_details_section is None:
+            raise ValueError("Details section not found")
+
+        make = get_detail(combined_details_section, "make")
+        model = get_detail(combined_details_section, "model")
+        version = get_detail(combined_details_section, "version")
+        year = int(get_detail(combined_details_section, "year"))
+        generation = get_detail(combined_details_section, "generation")
+        drive_type = get_detail(combined_details_section, "transmission")
+
+        # fuel_type = get_detail(details_section, "fuel_type")
+        # engine_size = get_detail(details_section, "engine_capacity")
+        # power = get_detail(details_section, "engine_power")
+        # body_type = get_detail(details_section, "body_type")
+        # gearbox = get_detail(details_section, "gearbox")
+
         # TODO: Fix that
-        # return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
-        #                      mileage_unit=mileage_unit, province=data_from_light_crawl['province'],
-        #                      city=data_from_light_crawl['city'], body_type=body_type, gearbox=gearbox,
-        #                      fuel_type=fuel_type)
-        #
-        return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
-                             city=data_from_light_crawl['city'])
+        return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
+                             mileage_unit=mileage_unit, province=data_from_light_crawl['province'],
+                             city=data_from_light_crawl['city'], body_type=body_type, gearbox=gearbox,
+                             fuel_type=fuel_type, make=make, model=model, version=version, year=year,
+                             generation=generation, drive_type=drive_type)
+
+        # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
+        #                      city=data_from_light_crawl['city'])
 
 
     def light_crawl(self):

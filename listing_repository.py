@@ -41,8 +41,21 @@ class ListingRepository:
             cursor.execute(
                 f'''CREATE TABLE IF NOT EXISTS {self.DETAILS_TABLE_NAME} (
                         advert_id TEXT PRIMARY KEY,
+                        engine_size_cm3 TEXT,
+                        engine_power_hp TEXT,
+                        year INTEGER,
+                        mileage TEXT,
+                        mileage_unit TEXT,
+                        province TEXT,
                         city TEXT,
-                        province TEXT
+                        body_type TEXT,
+                        gearbox TEXT,
+                        fuel_type TEXT,
+                        make TEXT,
+                        model TEXT,
+                        version TEXT,
+                        generation TEXT,
+                        drive_type TEXT
                     )
                 '''
             )
@@ -74,9 +87,24 @@ class ListingRepository:
         try:
             cursor.executemany(
                 f'''INSERT INTO {self.DETAILS_TABLE_NAME} (
-                advert_id, province, city
-                )
-                VALUES (?, ?, ?)
+                        advert_id,
+                        engine_size_cm3,
+                        engine_power_hp,
+                        year,
+                        mileage,
+                        mileage_unit,
+                        province,
+                        city,
+                        body_type,
+                        gearbox,
+                        fuel_type,
+                        make,
+                        model,
+                        version,
+                        generation,
+                        drive_type
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                 (astuple(item) for item in advert_details)
             )
