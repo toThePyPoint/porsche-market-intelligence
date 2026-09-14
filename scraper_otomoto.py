@@ -181,7 +181,24 @@ class OtomotoScraper:
 
         def get_detail(doc, test_id):
             element = doc.find(attrs={"data-testid": test_id})
-            return element.find_all("p")[-1].get_text(strip=True)
+
+            if element is None:
+                return None
+
+            detail_values = element.find_all("p")
+
+            if not detail_values:
+                return None
+
+            return detail_values[-1].get_text(strip=True)
+
+        def get_int_detail(doc, test_id):
+            detail_value = get_detail(doc, test_id)
+
+            if detail_value is None:
+                return None
+
+            return int(detail_value)
 
         if not self.test_mode:
             url = data_from_light_crawl['url']
@@ -239,13 +256,28 @@ class OtomotoScraper:
             car_details[name] = value
 
         # Ensure the right format of the data
-        mileage = str(car_details.get("Przebieg"))[:-3].strip()
-        mileage_unit = str(car_details.get("Przebieg"))[-3:].strip()
+        mileage_raw = car_details.get("Przebieg")
+
+        if mileage_raw:
+            mileage = mileage_raw[:-3].strip()
+            mileage_unit = mileage_raw[-3:].strip()
+        else:
+            mileage = None
+            mileage_unit = None
+
         fuel_type = car_details.get("Rodzaj paliwa")
         gearbox = car_details.get("Skrzynia biegów")
         body_type = car_details.get("Typ nadwozia")
-        engine_size = car_details.get("Pojemność skokowa").replace('cm3', '').replace(' ', '').strip()
-        power = car_details.get("Moc").replace('KM', '').replace(' ', '').strip()
+
+        engine_size = car_details.get("Pojemność skokowa")
+
+        if engine_size:
+            engine_size = engine_size.replace('cm3', '').replace(' ', '').strip()
+
+        power = car_details.get("Moc")
+
+        if power:
+            power = power.replace('KM', '').replace(' ', '').strip()
 
         # Section with details underneath
         combined_details_section = soup_doc.find(
@@ -259,7 +291,7 @@ class OtomotoScraper:
         make = get_detail(combined_details_section, "make")
         model = get_detail(combined_details_section, "model")
         version = get_detail(combined_details_section, "version")
-        year = int(get_detail(combined_details_section, "year"))
+        year = get_int_detail(combined_details_section, "year")
         generation = get_detail(combined_details_section, "generation")
         drive_type = get_detail(combined_details_section, "transmission")
         color = get_detail(combined_details_section, "color")
