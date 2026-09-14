@@ -55,7 +55,8 @@ class ListingRepository:
                         model TEXT,
                         version TEXT,
                         generation TEXT,
-                        drive_type TEXT
+                        drive_type TEXT,
+                        color TEXT
                     )
                 '''
             )
@@ -102,9 +103,10 @@ class ListingRepository:
                         model,
                         version,
                         generation,
-                        drive_type
+                        drive_type, 
+                        color
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                 (astuple(item) for item in advert_details)
             )

@@ -209,6 +209,7 @@ class OtomotoScraper:
                 version=None,
                 generation=None,
                 drive_type=None,
+                color=None
             )
             # return AdvertDetails(advert_id=advert_id, province=None, city=None)
 
@@ -261,6 +262,7 @@ class OtomotoScraper:
         year = int(get_detail(combined_details_section, "year"))
         generation = get_detail(combined_details_section, "generation")
         drive_type = get_detail(combined_details_section, "transmission")
+        color = get_detail(combined_details_section, "color")
 
         # fuel_type = get_detail(details_section, "fuel_type")
         # engine_size = get_detail(details_section, "engine_capacity")
@@ -273,7 +275,7 @@ class OtomotoScraper:
                              mileage_unit=mileage_unit, province=data_from_light_crawl['province'],
                              city=data_from_light_crawl['city'], body_type=body_type, gearbox=gearbox,
                              fuel_type=fuel_type, make=make, model=model, version=version, year=year,
-                             generation=generation, drive_type=drive_type)
+                             generation=generation, drive_type=drive_type, color=color)
 
         # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
         #                      city=data_from_light_crawl['city'])

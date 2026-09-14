@@ -49,3 +49,4 @@ class AdvertDetails:
     version: str | None
     generation: str | None
     drive_type: str | None
+    color: str | None
