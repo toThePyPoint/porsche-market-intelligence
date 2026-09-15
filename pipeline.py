@@ -40,6 +40,8 @@ class ListingService:
 
         self.repo = ListingRepository(self.db_name)
         self.repo.create_tables()
+
+        # TODO: ADD is_new_advert column
         self.repo.insert_listings_to_db(self.scraper.searched_listings)
 
         # Identify new adverts
@@ -49,6 +51,8 @@ class ListingService:
                                                 self.scraper.searched_listings,
                                                 adverts_in_db
                                                 )
+
+        print(f"Found {len(new_adverts)} new adverts.")
 
         # TODO: Run Heavy crawling from scraper
         self.scraper.heavy_crawl(new_adverts)

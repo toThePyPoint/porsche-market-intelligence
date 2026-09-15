@@ -20,6 +20,8 @@ class OtomotoScraper:
     }
 
     def __init__(self, url: str = None, test_mode: bool = False, pages_limit: int = None):
+        self.seen_advert_ids = set()  # advert ids already scraped within light crawl
+
         self.first_page_url = url  # first page of search results
         self.test_mode = test_mode
         self.pages_limit = pages_limit
@@ -86,7 +88,7 @@ class OtomotoScraper:
                 html = None  # lub inna domyślna wartość / obsługa błędu
         else:
             print(f"Downloading {url}")
-            print(f"Time: {datetime.datetime.now()}")
+            # print(f"Time: {datetime.datetime.now()}")
             html = requests.get(url, headers=self.HEADERS).text
 
         if html:
@@ -148,10 +150,17 @@ class OtomotoScraper:
     def scrape_one_page_of_search_results(self, search_results: Tag):
         """Finds all article items in the container and passes each to scrape_single_search_item."""
         articles = search_results.find_all("article", attrs={"data-id": True}, recursive=False)
+
         for article in articles:
             search_data, processing_data = self.scrape_single_search_item(article)
+
+            if search_data.advert_id in self.seen_advert_ids:
+                continue
+
             self.searched_listings.append(search_data)
             self.listings_processed_info.append(processing_data)
+
+            self.seen_advert_ids.add(search_data.advert_id)
 
 
     def scrape_all_pages_of_search_results(self):
