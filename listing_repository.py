@@ -41,10 +41,10 @@ class ListingRepository:
             cursor.execute(
                 f'''CREATE TABLE IF NOT EXISTS {self.DETAILS_TABLE_NAME} (
                         advert_id TEXT PRIMARY KEY,
-                        engine_size_cm3 TEXT,
-                        engine_power_hp TEXT,
+                        engine_size_cm3 INTEGER,
+                        engine_power_hp INTEGER,
                         year INTEGER,
-                        mileage TEXT,
+                        mileage INTEGER,
                         mileage_unit TEXT,
                         province TEXT,
                         city TEXT,
@@ -56,7 +56,13 @@ class ListingRepository:
                         version TEXT,
                         generation TEXT,
                         drive_type TEXT,
-                        color TEXT
+                        color TEXT,
+                        no_accident TEXT,
+                        country_origin TEXT,
+                        service_record TEXT,
+                        new_used TEXT,
+                        registered TEXT,
+                        first_seen_at DATE
                     )
                 '''
             )
@@ -104,9 +110,15 @@ class ListingRepository:
                         version,
                         generation,
                         drive_type, 
-                        color
+                        color,
+                        no_accident,    
+                        country_origin,
+                        service_record,
+                        new_used,
+                        registered,
+                        first_seen_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                 (astuple(item) for item in advert_details)
             )

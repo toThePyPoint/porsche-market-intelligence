@@ -66,7 +66,7 @@ class OtomotoScraper:
         if not self.test_mode:
             pause = random.randint(100, 1000) / 100
         else:
-            pause = 0.1
+            pause = 0.001
 
         return pause
 
@@ -143,7 +143,8 @@ class OtomotoScraper:
         city, province = location.replace(")", "").split(" (")
 
         return (SearchAdvertData(advert_id=advert_id, title=title, url=url, short_description=description,
-                                price=price, currency=currency, scraped_at=datetime.datetime.now()),
+                                price=price, currency=currency,
+                                scraped_at=datetime.datetime.now().replace(microsecond=0)),
                 AdvertProcessingData(advert_id=advert_id, city=city, province=province,))
 
 
@@ -235,7 +236,13 @@ class OtomotoScraper:
                 version=None,
                 generation=None,
                 drive_type=None,
-                color=None
+                color=None,
+                no_accident=None,
+                country_origin=None,
+                service_record=None,
+                new_used=None,
+                registered=None,
+                first_seen_at=None,
             )
             # return AdvertDetails(advert_id=advert_id, province=None, city=None)
 
@@ -268,7 +275,7 @@ class OtomotoScraper:
         mileage_raw = car_details.get("Przebieg")
 
         if mileage_raw:
-            mileage = mileage_raw[:-3].strip()
+            mileage = int(mileage_raw[:-3].replace(' ', '').strip())
             mileage_unit = mileage_raw[-3:].strip()
         else:
             mileage = None
@@ -281,12 +288,12 @@ class OtomotoScraper:
         engine_size = car_details.get("Pojemność skokowa")
 
         if engine_size:
-            engine_size = engine_size.replace('cm3', '').replace(' ', '').strip()
+            engine_size = int(engine_size.replace('cm3', '').replace(' ', '').strip())
 
         power = car_details.get("Moc")
 
         if power:
-            power = power.replace('KM', '').replace(' ', '').strip()
+            power = int(power.replace('KM', '').replace(' ', '').strip())
 
         # Section with details underneath
         combined_details_section = soup_doc.find(
@@ -305,6 +312,12 @@ class OtomotoScraper:
         drive_type = get_detail(combined_details_section, "transmission")
         color = get_detail(combined_details_section, "color")
 
+        no_accident = get_detail(combined_details_section, "no_accident")
+        country_origin = get_detail(combined_details_section, "country_origin")
+        service_record = get_detail(combined_details_section, "service_record")
+        new_used = get_detail(combined_details_section, "new_used")
+        registered = get_detail(combined_details_section, "registered")
+
         # fuel_type = get_detail(details_section, "fuel_type")
         # engine_size = get_detail(details_section, "engine_capacity")
         # power = get_detail(details_section, "engine_power")
@@ -316,7 +329,9 @@ class OtomotoScraper:
                              mileage_unit=mileage_unit, province=data_from_light_crawl['province'],
                              city=data_from_light_crawl['city'], body_type=body_type, gearbox=gearbox,
                              fuel_type=fuel_type, make=make, model=model, version=version, year=year,
-                             generation=generation, drive_type=drive_type, color=color)
+                             generation=generation, drive_type=drive_type, color=color, no_accident=no_accident,
+                             country_origin=country_origin, service_record=service_record, new_used=new_used,
+                             registered=registered, first_seen_at=datetime.date.today())
 
         # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
         #                      city=data_from_light_crawl['city'])
@@ -329,11 +344,13 @@ class OtomotoScraper:
 
     def heavy_crawl(self, new_adverts: dict):
         """Goes over new adverts urls and collects details data"""
-        for advert_id, data in new_adverts.items():
+        adverts_count = len(new_adverts)
+
+        for advert_number, (advert_id, data) in enumerate(new_adverts.items(), start=1):
             pause = self.get_random_pause()
             time.sleep(pause) # Random pause between requests
             print(f"Pause: {pause}")
-            print("Scraping advert " + str(advert_id))
+            print(f"Scraping advert {advert_number}/{adverts_count} {advert_id}")
 
             details = self.scrape_one_advert_from_url(advert_id=advert_id, data_from_light_crawl=data)
             self.advert_details.append(details)

@@ -30,11 +30,11 @@ class AdvertDetails:
     advert_id: str
 
     # Add units
-    engine_size_cm3: str | None
-    engine_power_hp: str | None
+    engine_size_cm3: int | None
+    engine_power_hp: int | None
 
     year: int | None
-    mileage: str | None
+    mileage: int | None
     mileage_unit: str | None
 
     province: str | None
@@ -50,3 +50,11 @@ class AdvertDetails:
     generation: str | None
     drive_type: str | None
     color: str | None
+
+    no_accident: str | None
+    country_origin: str | None
+    service_record: str | None
+    new_used: str | None
+    registered: str | None
+
+    first_seen_at: datetime.date | None
