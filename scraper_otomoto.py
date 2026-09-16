@@ -210,6 +210,16 @@ class OtomotoScraper:
 
             return int(detail_value)
 
+        def convert_to_bool(str_value: str) -> bool | None:
+            if str_value is None:
+                return None
+            if str_value.lower() == "tak":
+                return True
+            elif str_value.lower() == "nie":
+                return False
+            else:
+                return None
+
         if not self.test_mode:
             url = data_from_light_crawl['url']
         else:
@@ -331,6 +341,14 @@ class OtomotoScraper:
         registration_number = get_detail(combined_details_section, "registration")
         tuning = get_detail(combined_details_section, "tuning")
         original_owner = get_detail(combined_details_section, "original_owner")
+
+        no_accident = convert_to_bool(no_accident)
+        service_record = convert_to_bool(service_record)
+        registered_pl = convert_to_bool(registered_pl)
+        historical_vehicle = convert_to_bool(historical_vehicle)
+        has_registration = convert_to_bool(has_registration)
+        tuning = convert_to_bool(tuning)
+        original_owner = convert_to_bool(original_owner)
 
         # Get main description
         description_section = soup_doc.find(

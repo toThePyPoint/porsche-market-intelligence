@@ -51,18 +51,18 @@ class AdvertDetails:
     drive_type: str | None
     color: str | None
 
-    no_accident: str | None
+    no_accident: bool | None
     country_origin: str | None
-    service_record: str | None
+    service_record: bool | None
     new_used: str | None
-    registered_pl: str | None
+    registered_pl: bool | None
 
-    damaged: str | None
-    historical_vehicle: str | None
-    has_registration: str | None
+    damaged: bool | None
+    historical_vehicle: bool | None
+    has_registration: bool | None
     registration_number: str | None
-    tuning: str | None
-    original_owner: str | None
+    tuning: bool | None
+    original_owner: bool | None
     long_description: str | None
 
     first_seen_at: datetime.date | None
