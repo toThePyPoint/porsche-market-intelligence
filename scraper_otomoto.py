@@ -220,6 +220,15 @@ class OtomotoScraper:
             else:
                 return None
 
+        def get_seller_type(bs_doc):
+            if bs_doc.find("svg", attrs={"name": "dealer"}):
+                return "company"
+
+            if bs_doc.find("svg", attrs={"name": "private-seller"}):
+                return "private"
+
+            return None
+
         if not self.test_mode:
             url = data_from_light_crawl['url']
         else:
@@ -252,7 +261,6 @@ class OtomotoScraper:
                 service_record=None,
                 new_used=None,
                 registered_pl=None,
-                first_seen_at=None,
                 damaged=None,
                 historical_vehicle=None,
                 has_registration=None,
@@ -260,6 +268,8 @@ class OtomotoScraper:
                 tuning=None,
                 original_owner=None,
                 long_description=None,
+                seller_type=None,
+                first_seen_at=None,
             )
             # return AdvertDetails(advert_id=advert_id, province=None, city=None)
 
@@ -369,12 +379,8 @@ class OtomotoScraper:
             else:
                 description = description_element.get_text(" ", strip=True)
 
-        # fuel_type = get_detail(details_section, "fuel_type")
-        # engine_size = get_detail(details_section, "engine_capacity")
-        # power = get_detail(details_section, "engine_power")
-        # body_type = get_detail(details_section, "body_type")
-        # gearbox = get_detail(details_section, "gearbox")
-
+        # Get seller_type information
+        seller_type = get_seller_type(soup_doc)
 
         # TODO: Fix that
         return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
@@ -386,7 +392,7 @@ class OtomotoScraper:
                              registered_pl=registered_pl, damaged=damaged, historical_vehicle=historical_vehicle,
                              has_registration=has_registration, registration_number=registration_number,
                              tuning=tuning, original_owner=original_owner, long_description=description,
-                             first_seen_at=datetime.date.today())
+                             seller_type=seller_type, first_seen_at=datetime.date.today())
 
         # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
         #                      city=data_from_light_crawl['city'])

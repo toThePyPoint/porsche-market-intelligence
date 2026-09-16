@@ -69,6 +69,7 @@ class ListingRepository:
                         tuning BOOL,
                         original_owner BOOL,
                         long_description TEXT,
+                        seller_type,
                         first_seen_at DATE
                     )
                 '''
@@ -130,9 +131,10 @@ class ListingRepository:
                         tuning,
                         original_owner,
                         long_description,
+                        seller_type,
                         first_seen_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                 (astuple(item) for item in advert_details)
             )
