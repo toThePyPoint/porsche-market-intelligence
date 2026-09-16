@@ -60,7 +60,6 @@ class AdvertDetails:
     damaged: bool | None
     historical_vehicle: bool | None
     has_registration: bool | None
-    registration_number: str | None
     tuning: bool | None
     original_owner: bool | None
     long_description: str | None

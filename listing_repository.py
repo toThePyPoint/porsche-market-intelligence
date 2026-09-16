@@ -57,17 +57,16 @@ class ListingRepository:
                         generation TEXT,
                         drive_type TEXT,
                         color TEXT,
-                        no_accident BOOL,
+                        no_accident INTEGER,
                         country_origin TEXT,
-                        service_record BOOL,
+                        service_record INTEGER,
                         new_used TEXT,
-                        registered_pl BOOL,
-                        damaged BOOL,
-                        historical_vehicle BOOL,
-                        has_registration BOOL,
-                        registration_number TEXT,
-                        tuning BOOL,
-                        original_owner BOOL,
+                        registered_pl INTEGER,
+                        damaged INTEGER,
+                        historical_vehicle INTEGER,
+                        has_registration INTEGER,
+                        tuning INTEGER,
+                        original_owner INTEGER,
                         long_description TEXT,
                         seller_type TEXT,
                         dealer_type TEXT,
@@ -128,7 +127,6 @@ class ListingRepository:
                         damaged,
                         historical_vehicle,
                         has_registration,
-                        registration_number,
                         tuning,
                         original_owner,
                         long_description,
@@ -136,7 +134,7 @@ class ListingRepository:
                         dealer_type,
                         first_seen_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                 (astuple(item) for item in advert_details)
             )

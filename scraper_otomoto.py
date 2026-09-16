@@ -242,19 +242,6 @@ class OtomotoScraper:
 
             return None, None
 
-        def get_registration_number(doc):
-            element = doc.find(attrs={"data-testid": "registration"})
-
-            if element is None:
-                return None
-
-            reg_values = element.find_all("p")
-
-            if len(reg_values) < 2:
-                return None
-
-            return reg_values[-1].get_text(strip=True)
-
         if not self.test_mode:
             url = data_from_light_crawl['url']
         else:
@@ -290,7 +277,6 @@ class OtomotoScraper:
                 damaged=None,
                 historical_vehicle=None,
                 has_registration=None,
-                registration_number=None,
                 tuning=None,
                 original_owner=None,
                 long_description=None,
@@ -375,13 +361,13 @@ class OtomotoScraper:
         damaged = get_detail(combined_details_section, "damaged")
         historical_vehicle = get_detail(combined_details_section, "historical_vehicle")
         has_registration = get_detail(combined_details_section, "has_registration")
-        registration_number = get_registration_number(soup_doc)
         tuning = get_detail(combined_details_section, "tuning")
         original_owner = get_detail(combined_details_section, "original_owner")
 
         no_accident = convert_to_bool(no_accident)
         service_record = convert_to_bool(service_record)
         registered_pl = convert_to_bool(registered_pl)
+        damaged = convert_to_bool(damaged)
         historical_vehicle = convert_to_bool(historical_vehicle)
         has_registration = convert_to_bool(has_registration)
         tuning = convert_to_bool(tuning)
@@ -417,9 +403,9 @@ class OtomotoScraper:
                              generation=generation, drive_type=drive_type, color=color, no_accident=no_accident,
                              country_origin=country_origin, service_record=service_record, new_used=new_used,
                              registered_pl=registered_pl, damaged=damaged, historical_vehicle=historical_vehicle,
-                             has_registration=has_registration, registration_number=registration_number,
-                             tuning=tuning, original_owner=original_owner, long_description=description,
-                             seller_type=seller_type, dealer_type=dealer_type, first_seen_at=datetime.date.today())
+                             has_registration=has_registration, tuning=tuning, original_owner=original_owner,
+                             long_description=description, seller_type=seller_type, dealer_type=dealer_type,
+                             first_seen_at=datetime.date.today())
 
         # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
         #                      city=data_from_light_crawl['city'])
