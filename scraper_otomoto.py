@@ -27,12 +27,13 @@ class OtomotoScraper:
         "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36"
     }
 
-    def __init__(self, url: str = None, test_mode: bool = False, pages_limit: int = None):
+    def __init__(self, url: str = None, test_mode: bool = False, pages_limit: int = None, adverts_limit: int = None):
         self.seen_advert_ids = set()  # advert ids already scraped within light crawl
 
         self.first_page_url = url  # first page of search results
         self.test_mode = test_mode
         self.pages_limit = pages_limit
+        self.adverts_limit = adverts_limit
 
         self.last_page_number = None
         self.searched_listings: list[SearchAdvertData] = []  # general information retrieved within light crawl
@@ -85,14 +86,14 @@ class OtomotoScraper:
         """
 
         if self.test_mode:
-            print("Testing mode — retrieving data from hard drive")
-            print(f"Path: {url}")
+            # print("Testing mode — retrieving data from hard drive")
+            # print(f"Path: {url}")
             path = url
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     html = f.read()
             except FileNotFoundError:
-                print(f"Błąd: Plik '{path}' nie istnieje!")
+                # print(f"Błąd: Plik '{path}' nie istnieje!")
                 html = None  # lub inna domyślna wartość / obsługa błędu
         else:
             print(f"Downloading {url}")
@@ -180,7 +181,7 @@ class OtomotoScraper:
         for page_number in range(2, self.last_page_number + 1):
             pause = self.get_random_pause()
             time.sleep(pause) # Random pause between requests
-            print(f"Pause: {pause}")
+            # print(f"Pause: {pause}")
             print("Scraping page " + str(page_number))
 
             if self.test_mode:
@@ -419,8 +420,13 @@ class OtomotoScraper:
         for advert_number, (advert_id, data) in enumerate(new_adverts.items(), start=1):
             pause = self.get_random_pause()
             time.sleep(pause) # Random pause between requests
-            print(f"Pause: {pause}")
+            # print(f"Pause: {pause}")
             print(f"Scraping advert {advert_number}/{adverts_count} {advert_id}")
 
             details = self.scrape_one_advert_from_url(advert_id=advert_id, data_from_light_crawl=data)
             self.advert_details.append(details)
+
+            if self.adverts_limit:
+                if advert_number == self.adverts_limit:
+                    print("Adverts limit reached")
+                    break
