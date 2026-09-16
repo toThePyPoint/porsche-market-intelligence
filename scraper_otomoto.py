@@ -6,6 +6,14 @@ import requests
 from bs4 import BeautifulSoup, Tag
 from data_model import SearchAdvertData, AdvertProcessingData, AdvertDetails
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+logging.basicConfig(
+    filename="logs/scraper.log",
+    level=logging.INFO
+)
 
 class OtomotoScraper:
     LAST_ITEMS_ID = "ooa-13ptg7a"
@@ -218,6 +226,7 @@ class OtomotoScraper:
             elif str_value.lower() == "nie":
                 return False
             else:
+                logger.warning("Unknown boolean value from Otomoto: %r", str_value)
                 return None
 
         def get_seller_type(bs_doc):
