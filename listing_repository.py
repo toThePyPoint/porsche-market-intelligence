@@ -62,6 +62,13 @@ class ListingRepository:
                         service_record TEXT,
                         new_used TEXT,
                         registered_pl TEXT,
+                        damaged TEXT,
+                        historical_vehicle TEXT,
+                        has_registration TEXT,
+                        registration_number TEXT,
+                        tuning TEXT,
+                        original_owner TEXT,
+                        long_description TEXT,
                         first_seen_at DATE
                     )
                 '''
@@ -116,9 +123,16 @@ class ListingRepository:
                         service_record,
                         new_used,
                         registered_pl,
+                        damaged,
+                        historical_vehicle,
+                        has_registration,
+                        registration_number,
+                        tuning,
+                        original_owner,
+                        long_description,
                         first_seen_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                 (astuple(item) for item in advert_details)
             )

@@ -57,4 +57,12 @@ class AdvertDetails:
     new_used: str | None
     registered_pl: str | None
 
+    damaged: str | None
+    historical_vehicle: str | None
+    has_registration: str | None
+    registration_number: str | None
+    tuning: str | None
+    original_owner: str | None
+    long_description: str | None
+
     first_seen_at: datetime.date | None

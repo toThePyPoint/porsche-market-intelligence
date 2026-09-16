@@ -243,6 +243,13 @@ class OtomotoScraper:
                 new_used=None,
                 registered_pl=None,
                 first_seen_at=None,
+                damaged=None,
+                historical_vehicle=None,
+                has_registration=None,
+                registration_number=None,
+                tuning=None,
+                original_owner=None,
+                long_description=None,
             )
             # return AdvertDetails(advert_id=advert_id, province=None, city=None)
 
@@ -318,11 +325,38 @@ class OtomotoScraper:
         new_used = get_detail(combined_details_section, "new_used")
         registered_pl = get_detail(combined_details_section, "registered")  # Registered in Poland
 
+        damaged = get_detail(combined_details_section, "damaged")
+        historical_vehicle = get_detail(combined_details_section, "historical_vehicle")
+        has_registration = get_detail(combined_details_section, "has_registration")
+        registration_number = get_detail(combined_details_section, "registration")
+        tuning = get_detail(combined_details_section, "tuning")
+        original_owner = get_detail(combined_details_section, "original_owner")
+
+        # Get main description
+        description_section = soup_doc.find(
+            "div",
+            attrs={"data-testid": "content-description-section"}
+        )
+
+        if description_section is None:
+            description = None
+        else:
+            description_element = description_section.find(
+                "div",
+                attrs={"data-testid": "textWrapper"}
+            )
+
+            if description_element is None:
+                description = None
+            else:
+                description = description_element.get_text(" ", strip=True)
+
         # fuel_type = get_detail(details_section, "fuel_type")
         # engine_size = get_detail(details_section, "engine_capacity")
         # power = get_detail(details_section, "engine_power")
         # body_type = get_detail(details_section, "body_type")
         # gearbox = get_detail(details_section, "gearbox")
+
 
         # TODO: Fix that
         return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
@@ -331,7 +365,10 @@ class OtomotoScraper:
                              fuel_type=fuel_type, make=make, model=model, version=version, year=year,
                              generation=generation, drive_type=drive_type, color=color, no_accident=no_accident,
                              country_origin=country_origin, service_record=service_record, new_used=new_used,
-                             registered_pl=registered_pl, first_seen_at=datetime.date.today())
+                             registered_pl=registered_pl, damaged=damaged, historical_vehicle=historical_vehicle,
+                             has_registration=has_registration, registration_number=registration_number,
+                             tuning=tuning, original_owner=original_owner, long_description=description,
+                             first_seen_at=datetime.date.today())
 
         # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
         #                      city=data_from_light_crawl['city'])
