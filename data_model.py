@@ -55,6 +55,6 @@ class AdvertDetails:
     country_origin: str | None
     service_record: str | None
     new_used: str | None
-    registered: str | None
+    registered_pl: str | None
 
     first_seen_at: datetime.date | None

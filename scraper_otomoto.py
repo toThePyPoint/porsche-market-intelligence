@@ -241,7 +241,7 @@ class OtomotoScraper:
                 country_origin=None,
                 service_record=None,
                 new_used=None,
-                registered=None,
+                registered_pl=None,
                 first_seen_at=None,
             )
             # return AdvertDetails(advert_id=advert_id, province=None, city=None)
@@ -316,7 +316,7 @@ class OtomotoScraper:
         country_origin = get_detail(combined_details_section, "country_origin")
         service_record = get_detail(combined_details_section, "service_record")
         new_used = get_detail(combined_details_section, "new_used")
-        registered = get_detail(combined_details_section, "registered")
+        registered_pl = get_detail(combined_details_section, "registered")  # Registered in Poland
 
         # fuel_type = get_detail(details_section, "fuel_type")
         # engine_size = get_detail(details_section, "engine_capacity")
@@ -331,7 +331,7 @@ class OtomotoScraper:
                              fuel_type=fuel_type, make=make, model=model, version=version, year=year,
                              generation=generation, drive_type=drive_type, color=color, no_accident=no_accident,
                              country_origin=country_origin, service_record=service_record, new_used=new_used,
-                             registered=registered, first_seen_at=datetime.date.today())
+                             registered_pl=registered_pl, first_seen_at=datetime.date.today())
 
         # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
         #                      city=data_from_light_crawl['city'])

@@ -61,7 +61,7 @@ class ListingRepository:
                         country_origin TEXT,
                         service_record TEXT,
                         new_used TEXT,
-                        registered TEXT,
+                        registered_pl TEXT,
                         first_seen_at DATE
                     )
                 '''
@@ -115,7 +115,7 @@ class ListingRepository:
                         country_origin,
                         service_record,
                         new_used,
-                        registered,
+                        registered_pl,
                         first_seen_at
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
