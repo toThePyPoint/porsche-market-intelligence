@@ -65,5 +65,6 @@ class AdvertDetails:
     original_owner: bool | None
     long_description: str | None
     seller_type: str | None
+    dealer_type: str | None
 
     first_seen_at: datetime.date | None

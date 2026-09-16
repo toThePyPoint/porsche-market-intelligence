@@ -231,13 +231,29 @@ class OtomotoScraper:
                 return None
 
         def get_seller_type(bs_doc):
-            if bs_doc.find("svg", attrs={"name": "dealer"}):
-                return "company"
-
             if bs_doc.find("svg", attrs={"name": "private-seller"}):
-                return "private"
+                return "private", None
 
-            return None
+            if bs_doc.find("svg", attrs={"name": "authorized-dealer"}):
+                return "company", "authorized"
+
+            if bs_doc.find("svg", attrs={"name": "dealer"}):
+                return "company", "dealer"
+
+            return None, None
+
+        def get_registration_number(doc):
+            element = doc.find(attrs={"data-testid": "registration"})
+
+            if element is None:
+                return None
+
+            reg_values = element.find_all("p")
+
+            if len(reg_values) < 2:
+                return None
+
+            return reg_values[-1].get_text(strip=True)
 
         if not self.test_mode:
             url = data_from_light_crawl['url']
@@ -279,6 +295,7 @@ class OtomotoScraper:
                 original_owner=None,
                 long_description=None,
                 seller_type=None,
+                dealer_type=None,
                 first_seen_at=None,
             )
             # return AdvertDetails(advert_id=advert_id, province=None, city=None)
@@ -358,7 +375,7 @@ class OtomotoScraper:
         damaged = get_detail(combined_details_section, "damaged")
         historical_vehicle = get_detail(combined_details_section, "historical_vehicle")
         has_registration = get_detail(combined_details_section, "has_registration")
-        registration_number = get_detail(combined_details_section, "registration")
+        registration_number = get_registration_number(soup_doc)
         tuning = get_detail(combined_details_section, "tuning")
         original_owner = get_detail(combined_details_section, "original_owner")
 
@@ -390,7 +407,7 @@ class OtomotoScraper:
                 description = description_element.get_text(" ", strip=True)
 
         # Get seller_type information
-        seller_type = get_seller_type(soup_doc)
+        seller_type, dealer_type = get_seller_type(soup_doc)
 
         # TODO: Fix that
         return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
@@ -402,7 +419,7 @@ class OtomotoScraper:
                              registered_pl=registered_pl, damaged=damaged, historical_vehicle=historical_vehicle,
                              has_registration=has_registration, registration_number=registration_number,
                              tuning=tuning, original_owner=original_owner, long_description=description,
-                             seller_type=seller_type, first_seen_at=datetime.date.today())
+                             seller_type=seller_type, dealer_type=dealer_type, first_seen_at=datetime.date.today())
 
         # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
         #                      city=data_from_light_crawl['city'])
