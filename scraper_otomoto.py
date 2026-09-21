@@ -250,7 +250,6 @@ class OtomotoScraper:
         soup_doc = self.get_parsed_html(url)  # MAKE A REQUEST!
 
         if not soup_doc:
-            # TODO: Fix that
             return AdvertDetails(
                 advert_id=advert_id,
                 engine_size_cm3=None,
@@ -284,7 +283,6 @@ class OtomotoScraper:
                 dealer_type=None,
                 first_seen_at=None,
             )
-            # return AdvertDetails(advert_id=advert_id, province=None, city=None)
 
         # Find the section containing all main car details
         main_details = soup_doc.find(
@@ -395,7 +393,6 @@ class OtomotoScraper:
         # Get seller_type information
         seller_type, dealer_type = get_seller_type(soup_doc)
 
-        # TODO: Fix that
         return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
                              mileage_unit=mileage_unit, province=data_from_light_crawl['province'],
                              city=data_from_light_crawl['city'], body_type=body_type, gearbox=gearbox,
@@ -406,9 +403,6 @@ class OtomotoScraper:
                              has_registration=has_registration, tuning=tuning, original_owner=original_owner,
                              long_description=description, seller_type=seller_type, dealer_type=dealer_type,
                              first_seen_at=datetime.date.today())
-
-        # return AdvertDetails(advert_id=advert_id, province=data_from_light_crawl['province'],
-        #                      city=data_from_light_crawl['city'])
 
 
     def light_crawl(self):

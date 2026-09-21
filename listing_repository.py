@@ -37,7 +37,6 @@ class ListingRepository:
                 '''
             )
 
-            # TODO: reconsider NOT NULL constraint
             cursor.execute(
                 f'''CREATE TABLE IF NOT EXISTS {self.DETAILS_TABLE_NAME} (
                         advert_id TEXT PRIMARY KEY,
