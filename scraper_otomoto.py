@@ -40,6 +40,9 @@ class OtomotoScraper:
         self.listings_processed_info: list[AdvertProcessingData] = [] # details retrieved within light crawl
         self.advert_details: list[AdvertDetails] = [] # details retrieved within heavy crawl
 
+        self.id_missmatch_count: int = 0
+        self.adverts_duplicates_count: int = 0
+
         self.set_test_mode()
 
     def set_test_mode(self):
@@ -165,6 +168,7 @@ class OtomotoScraper:
             search_data, processing_data = self.scrape_single_search_item(article)
 
             if search_data.advert_id in self.seen_advert_ids:
+                self.adverts_duplicates_count += 1
                 continue
 
             self.searched_listings.append(search_data)
@@ -393,7 +397,7 @@ class OtomotoScraper:
         # Get seller_type information
         seller_type, dealer_type = get_seller_type(soup_doc)
 
-        # ID sanity check -
+        # ID sanity check - checks if id from search page matches id from single advert page
         id_element = next(
             (
                 p for p in soup_doc.find_all("p")
@@ -414,6 +418,7 @@ class OtomotoScraper:
                 advert_id,
                 detail_advert_id
             )
+            self.id_missmatch_count += 1
 
         return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
                              mileage_unit=mileage_unit, province=data_from_light_crawl['province'],

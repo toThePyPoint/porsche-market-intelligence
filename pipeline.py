@@ -52,7 +52,10 @@ class ListingService:
                                                 adverts_in_db
                                                 )
 
-        print(f"Found {len(new_adverts)} new adverts.")
-
         self.scraper.heavy_crawl(new_adverts)
         self.repo.insert_adverts_details_to_db(self.scraper.advert_details)
+
+        print(f"Total adverts scraped: {len(self.scraper.searched_listings)}")
+        print(f"Found {len(new_adverts)} new adverts.")
+        print(f"Id missmatch detected: {self.scraper.id_missmatch_count}")
+        print(f"Duplicates found during light crawl: {self.scraper.adverts_duplicates_count}")
