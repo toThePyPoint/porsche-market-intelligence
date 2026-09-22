@@ -89,6 +89,7 @@ class ListingRepository:
                 advert_id, snapshot_date, title, short_description, price, currency, scraped_at, url
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (advert_id, snapshot_date) DO NOTHING
                 ''',
                 (astuple(item) for item in listings)
             )
