@@ -25,14 +25,16 @@ class ListingRepository:
         try:
             cursor.execute(
                 f'''CREATE TABLE IF NOT EXISTS {self.SNAPSHOTS_TABLE_NAME} (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                         advert_id TEXT NOT NULL,
+                        snapshot_date DATE NOT NULL,
                         title TEXT NOT NULL,
                         short_description TEXT NOT NULL,
                         price INTEGER NOT NULL,
                         currency TEXT NOT NULL,
                         scraped_at DATETIME NOT NULL,
-                        url TEXT NOT NULL
+                        url TEXT NOT NULL,
+                        
+                        PRIMARY KEY (advert_id, snapshot_date)
                     )
                 '''
             )
@@ -84,9 +86,9 @@ class ListingRepository:
         try:
             cursor.executemany(
                 f'''INSERT INTO {self.SNAPSHOTS_TABLE_NAME} (
-                advert_id, title, short_description, price, currency, scraped_at, url
+                advert_id, snapshot_date, title, short_description, price, currency, scraped_at, url
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                 (astuple(item) for item in listings)
             )

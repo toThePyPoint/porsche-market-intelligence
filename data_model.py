@@ -5,6 +5,7 @@ from dataclasses import dataclass
 @dataclass
 class SearchAdvertData:
     advert_id: str
+    snapshot_date: datetime.date | None
 
     title: str
     short_description: str | None

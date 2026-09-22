@@ -152,7 +152,7 @@ class OtomotoScraper:
         city, province = location.replace(")", "").split(" (")
 
         return (SearchAdvertData(advert_id=advert_id, title=title, url=url, short_description=description,
-                                price=price, currency=currency,
+                                price=price, currency=currency, snapshot_date=datetime.date.today(),
                                 scraped_at=datetime.datetime.now().replace(microsecond=0)),
                 AdvertProcessingData(advert_id=advert_id, city=city, province=province,))
 
