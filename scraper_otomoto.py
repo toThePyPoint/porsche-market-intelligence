@@ -393,6 +393,28 @@ class OtomotoScraper:
         # Get seller_type information
         seller_type, dealer_type = get_seller_type(soup_doc)
 
+        # ID sanity check -
+        id_element = next(
+            (
+                p for p in soup_doc.find_all("p")
+                if "ID:" in p.get_text(strip=True)
+            ),
+            None
+        )
+
+        detail_advert_id = (
+            id_element.get_text(strip=True).replace("ID:", "").strip()
+            if id_element
+            else None
+        )
+
+        if advert_id != detail_advert_id:
+            logger.warning(
+                "Advert ID mismatch: search=%s, detail=%s",
+                advert_id,
+                detail_advert_id
+            )
+
         return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
                              mileage_unit=mileage_unit, province=data_from_light_crawl['province'],
                              city=data_from_light_crawl['city'], body_type=body_type, gearbox=gearbox,
