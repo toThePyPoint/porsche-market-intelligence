@@ -50,6 +50,7 @@ class OtomotoScraper:
         self.missing_engine_size_count: int = 0
         self.missing_engine_power_count: int = 0
         self.missing_year_count: int = 0
+        self.log_warnings_count: int = 0
 
         self.set_test_mode()
 
@@ -239,7 +240,8 @@ class OtomotoScraper:
             elif str_value.lower() == "nie":
                 return False
             else:
-                logger.warning("Unknown boolean value from Otomoto: %r", str_value)
+                self.log_warnings_count += 1
+                logger.warning(f"{datetime.datetime.now().replace(microsecond=0)}Unknown boolean value from Otomoto: %r", str_value)
                 return None
 
         def get_seller_type(bs_doc):
@@ -421,8 +423,9 @@ class OtomotoScraper:
         )
 
         if advert_id != detail_advert_id:
+            self.log_warnings_count += 1
             logger.warning(
-                "Advert ID mismatch: search=%s, detail=%s",
+                f"{datetime.datetime.now().replace(microsecond=0)}Advert ID mismatch: search=%s, detail=%s",
                 advert_id,
                 detail_advert_id
             )

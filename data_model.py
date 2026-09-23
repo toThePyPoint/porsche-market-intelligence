@@ -73,7 +73,8 @@ class AdvertDetails:
 @dataclass
 class ScraperRunsInfo:
     """Scraper run details"""
-    run_at: datetime.datetime | None
+    run_date: datetime.date | None
+    run_time: str | None
     listings_scraped: int | None
     new_listings: int | None
     duplicates: int | None
@@ -86,3 +87,4 @@ class ScraperRunsInfo:
     missing_size: int | None
     missing_power: int | None
     missing_year: int | None
+    log_warnings: int | None

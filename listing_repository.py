@@ -80,7 +80,8 @@ class ListingRepository:
             cursor.execute(
                 f"""CREATE TABLE IF NOT EXISTS {self.SCRAPER_RUNS_TABLE_NAME} (
                         run_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        run_at DATETIME,
+                        run_date DATE,
+                        run_time TIME,
                         listings_scraped INTEGER,
                         new_listings INTEGER,
                         duplicates INTEGER,
@@ -92,7 +93,8 @@ class ListingRepository:
                         missing_fuel_type INTEGER,
                         missing_size INTEGER,
                         missing_power INTEGER,
-                        missing_year INTEGER
+                        missing_year INTEGER,
+                        log_warnings INTEGER
                     )
                 """
             )
@@ -172,14 +174,14 @@ class ListingRepository:
         try:
             cursor.execute(
                 f'''INSERT INTO {self.SCRAPER_RUNS_TABLE_NAME} (
-                    run_at, listings_scraped, new_listings, duplicates, id_mismatch,
+                    run_date, run_time, listings_scraped, new_listings, duplicates, id_mismatch,
                     missing_mileage, missing_version, missing_gearbox, missing_drive_type,
-                    missing_fuel_type, missing_size, missing_power, missing_year
+                    missing_fuel_type, missing_size, missing_power, missing_year, log_warnings
                 )
                 VALUES (
-                    :run_at, :listings_scraped, :new_listings, :duplicates, :id_mismatch,
+                    :run_date, :run_time, :listings_scraped, :new_listings, :duplicates, :id_mismatch,
                     :missing_mileage, :missing_version, :missing_gearbox, :missing_drive_type,
-                    :missing_fuel_type, :missing_size, :missing_power, :missing_year
+                    :missing_fuel_type, :missing_size, :missing_power, :missing_year, :log_warnings
                 )
                 ''',
                 asdict(run_info)

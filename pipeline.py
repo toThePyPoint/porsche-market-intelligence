@@ -75,8 +75,10 @@ class ListingService:
         self.scraper.heavy_crawl(new_adverts)
         self.repo.insert_adverts_details_to_db(self.scraper.advert_details)
 
+        now = datetime.datetime.now().replace(microsecond=0)
         scraper_run_info = ScraperRunsInfo(
-            run_at=datetime.datetime.now().replace(microsecond=0),
+            run_date=now.date(),
+            run_time=now.strftime("%H:%M:%S"),
             listings_scraped=len(self.scraper.searched_listings),
             new_listings=len(new_adverts),
             id_mismatch=self.scraper.id_missmatch_count,
@@ -89,6 +91,7 @@ class ListingService:
             missing_size=self.scraper.missing_engine_size_count,
             missing_power=self.scraper.missing_engine_power_count,
             missing_year=self.scraper.missing_year_count,
+            log_warnings=self.scraper.log_warnings_count
         )
         self.repo.insert_scraper_run_info(scraper_run_info)
         self.print_summary(count_of_new_adverts=len(new_adverts))
