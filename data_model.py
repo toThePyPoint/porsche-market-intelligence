@@ -68,3 +68,21 @@ class AdvertDetails:
     dealer_type: str | None
 
     first_seen_at: datetime.date | None
+
+
+@dataclass
+class ScraperRunsInfo:
+    """Scraper run details"""
+    run_at: datetime.datetime | None
+    listings_scraped: int | None
+    new_listings: int | None
+    duplicates: int | None
+    id_mismatch: int | None
+    missing_mileage: int | None
+    missing_version: int | None
+    missing_gearbox: int | None
+    missing_drive_type: int | None
+    missing_fuel_type: int | None
+    missing_size: int | None
+    missing_power: int | None
+    missing_year: int | None

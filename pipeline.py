@@ -1,4 +1,6 @@
-from data_model import SearchAdvertData, AdvertProcessingData
+import datetime
+
+from data_model import SearchAdvertData, AdvertProcessingData, ScraperRunsInfo
 from listing_repository import ListingRepository
 from scraper_otomoto import OtomotoScraper
 
@@ -73,5 +75,21 @@ class ListingService:
         self.scraper.heavy_crawl(new_adverts)
         self.repo.insert_adverts_details_to_db(self.scraper.advert_details)
 
+        scraper_run_info = ScraperRunsInfo(
+            run_at=datetime.datetime.now().replace(microsecond=0),
+            listings_scraped=len(self.scraper.searched_listings),
+            new_listings=len(new_adverts),
+            id_mismatch=self.scraper.id_missmatch_count,
+            duplicates=self.scraper.adverts_duplicates_count,
+            missing_mileage=self.scraper.missing_mileage_count,
+            missing_version=self.scraper.missing_version_count,
+            missing_gearbox=self.scraper.missing_gearbox_count,
+            missing_drive_type=self.scraper.missing_drive_type_count,
+            missing_fuel_type=self.scraper.missing_fuel_type_count,
+            missing_size=self.scraper.missing_engine_size_count,
+            missing_power=self.scraper.missing_engine_power_count,
+            missing_year=self.scraper.missing_year_count,
+        )
+        self.repo.insert_scraper_run_info(scraper_run_info)
         self.print_summary(count_of_new_adverts=len(new_adverts))
 

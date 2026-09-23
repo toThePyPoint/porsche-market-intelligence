@@ -1,12 +1,13 @@
 import sqlite3
-from dataclasses import astuple
+from dataclasses import astuple, asdict
 
-from data_model import SearchAdvertData, AdvertDetails
+from data_model import SearchAdvertData, AdvertDetails, ScraperRunsInfo
 
 
 class ListingRepository:
     SNAPSHOTS_TABLE_NAME = 'listings_snapshots'
     DETAILS_TABLE_NAME = 'listings_details'
+    SCRAPER_RUNS_TABLE_NAME = 'scraper_runs_info'
 
     def __init__(self, db_name: str):
         # self.searched_listings = listings
@@ -76,6 +77,26 @@ class ListingRepository:
                 '''
             )
 
+            cursor.execute(
+                f"""CREATE TABLE IF NOT EXISTS {self.SCRAPER_RUNS_TABLE_NAME} (
+                        run_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        run_at DATETIME,
+                        listings_scraped INTEGER,
+                        new_listings INTEGER,
+                        duplicates INTEGER,
+                        id_mismatch INTEGER,
+                        missing_mileage INTEGER,
+                        missing_version INTEGER,
+                        missing_gearbox INTEGER,
+                        missing_drive_type INTEGER,
+                        missing_fuel_type INTEGER,
+                        missing_size INTEGER,
+                        missing_power INTEGER,
+                        missing_year INTEGER
+                    )
+                """
+            )
+
             conn.commit()
         finally:
             conn.close()
@@ -139,6 +160,29 @@ class ListingRepository:
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                 (astuple(item) for item in advert_details)
+            )
+
+            conn.commit()
+        finally:
+            conn.close()
+
+    def insert_scraper_run_info(self, run_info: ScraperRunsInfo):
+        """Inserts scraper run details into the database."""
+        conn, cursor = self.set_connection()
+        try:
+            cursor.execute(
+                f'''INSERT INTO {self.SCRAPER_RUNS_TABLE_NAME} (
+                    run_at, listings_scraped, new_listings, duplicates, id_mismatch,
+                    missing_mileage, missing_version, missing_gearbox, missing_drive_type,
+                    missing_fuel_type, missing_size, missing_power, missing_year
+                )
+                VALUES (
+                    :run_at, :listings_scraped, :new_listings, :duplicates, :id_mismatch,
+                    :missing_mileage, :missing_version, :missing_gearbox, :missing_drive_type,
+                    :missing_fuel_type, :missing_size, :missing_power, :missing_year
+                )
+                ''',
+                asdict(run_info)
             )
 
             conn.commit()
