@@ -35,6 +35,24 @@ class ListingService:
 
         return result
 
+    def print_summary(self, count_of_new_adverts: int):
+        print("--------------------------------------")
+        print(f"============== SUMMARY ==============")
+        print("--------------------------------------")
+        print(f"Total adverts scraped: {len(self.scraper.searched_listings)}")
+        print(f"Found {count_of_new_adverts} new adverts.")
+        print(f"Id missmatch detected: {self.scraper.id_missmatch_count}")
+        print(f"Duplicates found during light crawl: {self.scraper.adverts_duplicates_count}")
+        print(f"Missing mileage: {self.scraper.missing_mileage_count}")
+        print(f"Missing version: {self.scraper.missing_version_count}")
+        print(f"Missing gearbox: {self.scraper.missing_gearbox_count}")
+        print(f"Missing drive type: {self.scraper.missing_drive_type_count}")
+        print(f"Missing fuel type: {self.scraper.missing_fuel_type_count}")
+        print(f"Missing engine size: {self.scraper.missing_engine_size_count}")
+        print(f"Missing engine power: {self.scraper.missing_engine_power_count}")
+        print(f"Missing year: {self.scraper.missing_year_count}")
+        print("--------------------------------------")
+
     def process(self):
         """Main pipeline of gathering adverts."""
         self.scraper.light_crawl()
@@ -55,19 +73,5 @@ class ListingService:
         self.scraper.heavy_crawl(new_adverts)
         self.repo.insert_adverts_details_to_db(self.scraper.advert_details)
 
-        print("--------------------------------------")
-        print(f"============== SUMMARY ==============")
-        print("--------------------------------------")
-        print(f"Total adverts scraped: {len(self.scraper.searched_listings)}")
-        print(f"Found {len(new_adverts)} new adverts.")
-        print(f"Id missmatch detected: {self.scraper.id_missmatch_count}")
-        print(f"Duplicates found during light crawl: {self.scraper.adverts_duplicates_count}")
-        print(f"Missing mileage: {self.scraper.missing_mileage_count}")
-        print(f"Missing version: {self.scraper.missing_version_count}")
-        print(f"Missing gearbox: {self.scraper.missing_gearbox_count}")
-        print(f"Missing drive type: {self.scraper.missing_drive_type_count}")
-        print(f"Missing fuel type: {self.scraper.missing_fuel_type_count}")
-        print(f"Missing engine size: {self.scraper.missing_engine_size_count}")
-        print(f"Missing engine power: {self.scraper.missing_engine_power_count}")
-        print(f"Missing year: {self.scraper.missing_year_count}")
-        print("--------------------------------------")
+        self.print_summary(count_of_new_adverts=len(new_adverts))
+
