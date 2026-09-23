@@ -42,6 +42,14 @@ class OtomotoScraper:
 
         self.id_missmatch_count: int = 0
         self.adverts_duplicates_count: int = 0
+        self.missing_mileage_count: int = 0
+        self.missing_version_count: int = 0
+        self.missing_gearbox_count: int = 0
+        self.missing_drive_type_count: int = 0
+        self.missing_fuel_type_count: int = 0
+        self.missing_engine_size_count: int = 0
+        self.missing_engine_power_count: int = 0
+        self.missing_year_count: int = 0
 
         self.set_test_mode()
 
@@ -419,6 +427,23 @@ class OtomotoScraper:
                 detail_advert_id
             )
             self.id_missmatch_count += 1
+
+        if not mileage:
+            self.missing_mileage_count += 1
+        if not version:
+            self.missing_version_count += 1
+        if not year:
+            self.missing_year_count += 1
+        if not gearbox:
+            self.missing_gearbox_count += 1
+        if not fuel_type:
+            self.missing_fuel_type_count += 1
+        if not engine_size:
+            self.missing_engine_size_count += 1
+        if not power:
+            self.missing_engine_power_count +=1
+        if not drive_type:
+            self.missing_drive_type_count += 1
 
         return AdvertDetails(advert_id=advert_id, engine_size_cm3=engine_size, engine_power_hp=power, mileage=mileage,
                              mileage_unit=mileage_unit, province=data_from_light_crawl['province'],
