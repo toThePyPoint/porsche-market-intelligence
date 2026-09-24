@@ -106,7 +106,10 @@ class ListingRepository:
 
     def create_views(self):
         conn, cursor = self.set_connection()
-        conn.executescript(Path("database/views.sql").read_text())
+        try:
+            conn.executescript(Path("database/views.sql").read_text())
+        finally:
+            conn.close()
 
     def insert_listings_to_db(self, listings: list[SearchAdvertData]):
         """Inserts listings into database to table with listings snapshots."""
