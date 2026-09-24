@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 from dataclasses import astuple, asdict
 
 from data_model import SearchAdvertData, AdvertDetails, ScraperRunsInfo
@@ -102,6 +103,10 @@ class ListingRepository:
             conn.commit()
         finally:
             conn.close()
+
+    def create_views(self):
+        conn, cursor = self.set_connection()
+        conn.executescript(Path("database/views.sql").read_text())
 
     def insert_listings_to_db(self, listings: list[SearchAdvertData]):
         """Inserts listings into database to table with listings snapshots."""
