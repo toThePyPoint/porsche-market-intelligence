@@ -61,6 +61,7 @@ class ListingService:
 
         self.repo = ListingRepository(self.db_name)
         self.repo.create_tables()
+        self.repo.create_views()
 
         self.repo.insert_listings_to_db(self.scraper.searched_listings)
 
