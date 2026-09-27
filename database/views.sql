@@ -27,10 +27,10 @@ SELECT
     last_snapshot.price - first_snapshot.price AS price_change,
     l.currency,
     ROUND(
-        (last_snapshot.price - first_snapshot.price) * 100.0
+        (last_snapshot.price - first_snapshot.price)
         / first_snapshot.price,
         2
-    ) AS price_change_pct
+    ) AS price_change
 FROM lifecycle l
 JOIN listings_snapshots first_snapshot
     ON first_snapshot.advert_id = l.advert_id
