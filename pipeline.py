@@ -95,5 +95,8 @@ class ListingService:
             log_warnings=self.scraper.log_warnings_count
         )
         self.repo.insert_scraper_run_info(scraper_run_info)
+
+        self.repo.export_to_csv("data/csv_files")
+
         self.print_summary(count_of_new_adverts=len(new_adverts))
 

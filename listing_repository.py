@@ -1,4 +1,5 @@
 import sqlite3
+import pandas as pd
 from pathlib import Path
 from dataclasses import astuple, asdict
 
@@ -210,3 +211,44 @@ class ListingRepository:
             conn.close()
 
         return advert_ids
+
+    def export_to_csv(self, output_dir: str):
+        """
+        Exports all SQLite tables and views to separate CSV files.
+
+        Args:
+            output_dir: Directory where CSV files will be saved.
+        """
+
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        with sqlite3.connect(self.db_name) as conn:
+            objects = pd.read_sql_query(
+                """
+                SELECT name, type
+                FROM sqlite_master
+                WHERE type IN ('table', 'view')
+                AND name NOT LIKE 'sqlite_%'
+                ORDER BY type, name
+                """,
+                conn
+            )
+
+            for _, obj in objects.iterrows():
+                object_name = obj["name"]
+
+                df = pd.read_sql_query(
+                    f'SELECT * FROM "{object_name}"',
+                    conn
+                )
+
+                csv_path = output_path / f"{object_name}.csv"
+
+                df.to_csv(
+                    csv_path,
+                    index=False,
+                    encoding="utf-8-sig"
+                )
+
+                print(f"Exported {obj['type']}: {object_name} → {csv_path}")
