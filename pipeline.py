@@ -1,8 +1,9 @@
 import datetime
 
-from data_model import SearchAdvertData, AdvertProcessingData, ScraperRunsInfo
+from data_model import SearchAdvertData, AdvertProcessingData, ScraperRunsInfo, ExchangeRate
 from listing_repository import ListingRepository
 from scraper_otomoto import OtomotoScraper
+from exchange_rates import get_current_exchange_rate
 
 
 class ListingService:
@@ -95,6 +96,10 @@ class ListingService:
             log_warnings=self.scraper.log_warnings_count
         )
         self.repo.insert_scraper_run_info(scraper_run_info)
+
+        rate = get_current_exchange_rate("EUR")
+        exchange_rate = ExchangeRate(rate_date=now.date(), currency="EUR", rate=rate)
+        self.repo.insert_exchange_rates_to_db(exchange_rate=exchange_rate)
 
         self.repo.export_to_csv("data/csv_files")
 

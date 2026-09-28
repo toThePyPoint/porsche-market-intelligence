@@ -88,3 +88,11 @@ class ScraperRunsInfo:
     missing_power: int | None
     missing_year: int | None
     log_warnings: int | None
+
+
+@dataclass
+class ExchangeRate:
+    """Exchange rates for EUR PLN"""
+    rate_date: datetime.date | None
+    currency: str | None
+    rate: float | None

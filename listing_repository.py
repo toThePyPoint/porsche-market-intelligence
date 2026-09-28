@@ -3,13 +3,14 @@ import pandas as pd
 from pathlib import Path
 from dataclasses import astuple, asdict
 
-from data_model import SearchAdvertData, AdvertDetails, ScraperRunsInfo
+from data_model import SearchAdvertData, AdvertDetails, ScraperRunsInfo, ExchangeRate
 
 
 class ListingRepository:
     SNAPSHOTS_TABLE_NAME = 'listings_snapshots'
     DETAILS_TABLE_NAME = 'listings_details'
     SCRAPER_RUNS_TABLE_NAME = 'scraper_runs_info'
+    EXCHANGE_RATES_TABLE_NAME = 'exchange_rates'
 
     def __init__(self, db_name: str):
         # self.searched_listings = listings
@@ -97,6 +98,17 @@ class ListingRepository:
                         missing_power INTEGER,
                         missing_year INTEGER,
                         log_warnings INTEGER
+                    )
+                """
+            )
+
+            cursor.execute(
+                f"""CREATE TABLE IF NOT EXISTS {self.EXCHANGE_RATES_TABLE_NAME} (
+                        rate_date DATE NOT NULL,
+                        currency TEXT NOT NULL,
+                        rate REAL NOT NULL,
+                    
+                        PRIMARY KEY (rate_date, currency)
                     )
                 """
             )
@@ -194,6 +206,24 @@ class ListingRepository:
                 )
                 ''',
                 asdict(run_info)
+            )
+
+            conn.commit()
+        finally:
+            conn.close()
+
+    def insert_exchange_rates_to_db(self, exchange_rate: ExchangeRate):
+        """Inserts listings into database to table with listings snapshots."""
+        conn, cursor = self.set_connection()
+        try:
+            cursor.execute(
+                f'''INSERT INTO {self.EXCHANGE_RATES_TABLE_NAME} (
+                rate_date, currency, rate
+                )
+                VALUES (:rate_date, :currency, :rate)
+                ON CONFLICT (rate_date, currency) DO NOTHING
+                ''',
+                asdict(exchange_rate)
             )
 
             conn.commit()
