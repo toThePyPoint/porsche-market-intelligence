@@ -17,7 +17,9 @@ logging.basicConfig(
 
 class OtomotoScraper:
     LAST_ITEMS_ID = "ooa-13ptg7a"
-    SHORT_DESCRIPTION_ELEMENT_ID = "e1kj25my0.ooa-nxfgg7"
+    # SHORT_DESCRIPTION_ELEMENT_ID = "e1kj25my0.ooa-nxfgg7"
+    # SHORT_DESCRIPTION_ELEMENT_ID = "e3pdcj30 ooa-nxfgg7"
+    SHORT_DESCRIPTION_ELEMENT_ID = "ooa-nxfgg7"
     LOCATION_ID = "ooa-1nqstmz"
 
     HEADERS = {
@@ -151,7 +153,12 @@ class OtomotoScraper:
         url = title_element.get("href")
 
         short_description_element = article.select_one(f"p.{self.SHORT_DESCRIPTION_ELEMENT_ID}")
-        description = short_description_element.get_text(strip=True)
+
+        description = (
+            short_description_element.get_text(strip=True)
+            if short_description_element
+            else None
+        )
 
         price_element = article.find("h3")
         price = int(price_element.get_text(strip=True).replace(" ", ""))
