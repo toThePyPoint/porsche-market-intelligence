@@ -29,13 +29,15 @@ class OtomotoScraper:
         "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36"
     }
 
-    def __init__(self, url: str = None, test_mode: bool = False, pages_limit: int = None, adverts_limit: int = None):
+    def __init__(self, url: str = None, test_mode: bool = False, pages_limit: int = None, adverts_limit: int = None,
+                 sorting_url_suffix: str = None):
         self.seen_advert_ids = set()  # advert ids already scraped within light crawl
 
         self.first_page_url = url  # first page of search results
         self.test_mode = test_mode
         self.pages_limit = pages_limit
         self.adverts_limit = adverts_limit
+        self.sorting_suffix = sorting_url_suffix
 
         self.last_page_number = None
         self.searched_listings: list[SearchAdvertData] = []  # general information retrieved within light crawl
@@ -63,7 +65,10 @@ class OtomotoScraper:
             self.last_page_number = 3
 
     def get_url_for_given_page_number(self, page_number: int):
-        return f"{self.first_page_url}?page={page_number}"
+        if self.sorting_suffix:
+            return f"{self.first_page_url}?page={page_number}&{self.sorting_suffix}"
+        else:
+            return f"{self.first_page_url}?page={page_number}"
 
     def get_test_path_for_given_page_number(self, page_number: int):
         return self.first_page_url.replace(".html", str(f"_page{page_number}.html"))
@@ -122,13 +127,14 @@ class OtomotoScraper:
         return soup_doc
 
 
-    def initialize_search_scraping(self, url, fetch_last_page_num: bool = False) -> None:
+    def initialize_search_scraping(self, url, page_num = 1, fetch_last_page_num: bool = False) -> None:
         """Fetches and scrapes a single search results page.
 
         Args:
             url: The target page URL to fetch and process.
             fetch_last_page_num: If True, extracts the total page count
                 from the response and updates self.last_page_number.
+            page_num: number of scraped page
 
         Side Effects:
             Appends parsed items to the internal storage.
@@ -138,7 +144,7 @@ class OtomotoScraper:
 
         # Extracts the main search results container (div[data-testid='search-results']) from the page.
         search_results = soup_doc.find("div", {"data-testid": "search-results"})
-        self.scrape_one_page_of_search_results(search_results)
+        self.scrape_one_page_of_search_results(search_results, page_num)
 
         if fetch_last_page_num:
             self.get_last_page_number(soup_doc)
@@ -176,7 +182,7 @@ class OtomotoScraper:
                 AdvertProcessingData(advert_id=advert_id, city=city, province=province,))
 
 
-    def scrape_one_page_of_search_results(self, search_results: Tag):
+    def scrape_one_page_of_search_results(self, search_results: Tag, page_num: int):
         """Finds all article items in the container and passes each to scrape_single_search_item."""
         articles = search_results.find_all("article", attrs={"data-id": True}, recursive=False)
 
@@ -185,6 +191,7 @@ class OtomotoScraper:
 
             if search_data.advert_id in self.seen_advert_ids:
                 self.adverts_duplicates_count += 1
+                print(f"Duplicated listing on page {page_num}! {search_data.advert_id} — {search_data.url}")
                 continue
 
             self.searched_listings.append(search_data)
@@ -208,7 +215,7 @@ class OtomotoScraper:
                 page_url = self.get_test_path_for_given_page_number(page_number)
             else:
                 page_url = self.get_url_for_given_page_number(page_number)
-            self.initialize_search_scraping(page_url)
+            self.initialize_search_scraping(page_url, page_number)
 
             if self.pages_limit:
                 if page_number == self.pages_limit:
@@ -469,7 +476,11 @@ class OtomotoScraper:
 
     def light_crawl(self):
         """Goes over search pages and collects general listings data"""
-        self.initialize_search_scraping(self.first_page_url, True)
+        if self.sorting_suffix:
+            url = f"{self.first_page_url}?{self.sorting_suffix}"
+        else:
+            url = self.first_page_url
+        self.initialize_search_scraping(url, fetch_last_page_num = True)
         self.scrape_all_pages_of_search_results()
 
     def heavy_crawl(self, new_adverts: dict):

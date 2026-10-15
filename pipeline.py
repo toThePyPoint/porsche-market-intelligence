@@ -7,11 +7,12 @@ from exchange_rates import get_current_exchange_rate
 
 
 class ListingService:
-    def __init__(self, url: str = None, test_mode: bool = False, pages_limit: int = None, adverts_limit:int = None,
+    def __init__(self, url: str = None, sorting_suffix: str = None, test_mode: bool = False, pages_limit: int = None, adverts_limit:int = None,
                  db_name: str = "test_db.db"):
         self.db_name = db_name
         self.repo = None
-        self.scraper = OtomotoScraper(url=url, test_mode=test_mode, pages_limit=pages_limit, adverts_limit=adverts_limit)
+        self.scraper = OtomotoScraper(url=url, test_mode=test_mode, pages_limit=pages_limit,
+                                      adverts_limit=adverts_limit, sorting_url_suffix=sorting_suffix)
 
     @staticmethod
     def identify_new_adverts(listings_processed_info: list[AdvertProcessingData],
