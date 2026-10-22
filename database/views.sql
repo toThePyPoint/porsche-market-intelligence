@@ -78,3 +78,31 @@ WHERE s.snapshot_date = (
     SELECT MAX(snapshot_date)
     FROM listings_snapshots
 );
+
+
+CREATE VIEW IF NOT EXISTS vw_monthly_listing_prices AS
+WITH ranked_snapshots AS (
+    SELECT
+        advert_id,
+        DATE(snapshot_date, 'start of month') AS month,
+        scraped_at,
+        price,
+        currency,
+        ROW_NUMBER() OVER (
+            PARTITION BY advert_id, DATE(snapshot_date, 'start of month')
+            ORDER BY scraped_at DESC
+        ) AS rn
+    FROM listings_snapshots
+)
+SELECT
+    s.advert_id,
+    s.month,
+    DATE(s.scraped_at) AS last_observed_at,
+    s.price,
+    s.currency,
+    d.generation,
+    d.damaged
+FROM ranked_snapshots AS s
+LEFT JOIN listings_details AS d
+    ON s.advert_id = d.advert_id
+WHERE s.rn = 1;
