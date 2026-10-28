@@ -106,3 +106,34 @@ FROM ranked_snapshots AS s
 LEFT JOIN listings_details AS d
     ON s.advert_id = d.advert_id
 WHERE s.rn = 1;
+
+
+CREATE VIEW vw_listing_price_changes AS
+WITH price_history AS (
+    SELECT
+        advert_id,
+        snapshot_date,
+        price,
+        currency,
+        LAG(price) OVER (
+            PARTITION BY advert_id
+            ORDER BY snapshot_date
+        ) AS previous_price,
+        LAG(currency) OVER (
+            PARTITION BY advert_id
+            ORDER BY snapshot_date
+        ) AS previous_currency
+    FROM listings_snapshots
+)
+SELECT
+    advert_id,
+    snapshot_date,
+    previous_price,
+    price AS current_price,
+    CASE
+        WHEN price < previous_price THEN 'Decreased'
+        WHEN price > previous_price THEN 'Increased'
+        WHEN price = previous_price THEN 'No change'
+    END AS price_change_type
+FROM price_history
+WHERE previous_price IS NOT NULL;
