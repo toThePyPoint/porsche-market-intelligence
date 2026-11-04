@@ -242,12 +242,13 @@ class ListingRepository:
 
         return advert_ids
 
-    def export_to_csv(self, output_dir: str):
+    def export_to_csv(self, output_dir: str, f_pref: str= ""):
         """
         Exports all SQLite tables and views to separate CSV files.
 
         Args:
             output_dir: Directory where CSV files will be saved.
+            f_pref: File prefix - can be a model of the car. Will be used as prefix in exported csv files.
         """
 
         output_path = Path(output_dir)
@@ -273,7 +274,7 @@ class ListingRepository:
                     conn
                 )
 
-                csv_path = output_path / f"{object_name}.csv"
+                csv_path = output_path / f"{f_pref}{object_name}.csv"
 
                 df.to_csv(
                     csv_path,
