@@ -1,15 +1,12 @@
-# porsche-market-intelligence
-Porsche 911 Market Intelligence is a system that regularly builds its own historical database of listings and allows you to analyze the current state, segmentation, and dynamics of the Porsche 911 market.
-
 # Porsche 911 Market Intelligence
 
-Porsche 911 Market Intelligence is an educational data analytics project that builds a historical database of Porsche 911 listings from Otomoto and uses it to analyze the current state, segmentation, pricing and dynamics of the market.
+Porsche 911 Market Intelligence is an educational data analytics project that builds a historical database of Porsche 911 listings from online marketplace and uses it to analyze the current state, segmentation, pricing and dynamics of the market.
 
 The project combines **Python, web scraping, data modeling, SQLite, SQL and Power BI** into one end-to-end analytical pipeline.
 
 The goal is not only to build a scraper or a dashboard, but to demonstrate how a technical manager can design a small data product: from automated data acquisition and data quality controls, through structured storage and analytical views, to business-oriented reporting.
 
-> **Project status:** Data collection and analytical data layer are implemented. The next stage is the Power BI analytical layer and dashboard.
+> **Project status:** The Python data pipeline and analytical database are implemented. The first Power BI dashboard MVP is complete. The project will continue to evolve as more historical observations are collected and additional analyses are developed.
 
 ---
 
@@ -21,11 +18,9 @@ The project is designed to answer questions such as:
 - How is the market segmented by model, generation, body type, drivetrain, engine and other characteristics?
 - What are the typical asking prices for different segments?
 - How do prices and supply change over time?
-- Which listings are new, still active or no longer observed?
 - How long do listings remain in the observed market?
 - How frequently do sellers change asking prices?
 - How do mileage, specification and other vehicle characteristics relate to asking prices?
-- How can individual listings be compared with similar cars?
 
 The analytical questions are intentionally defined before building the Power BI report. This keeps the dashboard focused on decision-relevant insights rather than simply displaying available data.
 
@@ -36,7 +31,7 @@ The analytical questions are intentionally defined before building the Power BI 
 The current architecture follows an end-to-end data pipeline:
 
 ```text
-Otomoto
+Online-marketplace
    │
    ▼
 Python scraper
@@ -78,7 +73,7 @@ The SQLite → CSV → Power BI step is currently used as a simple local bridge 
 
 ### Source
 
-The project uses **Otomoto** as the source of Porsche 911 listing data.
+The project uses automotive marketplace as the source of Porsche 911 listing data.
 
 The scraper performs two levels of data collection:
 
@@ -167,7 +162,7 @@ Stores detailed attributes of a vehicle.
 
 `advert_id` is the primary key because the detailed record represents the vehicle/listing entity rather than an individual daily observation.
 
-This table contains structured vehicle and seller information collected during the heavy crawl.
+This table contains structured vehicle information collected during the heavy crawl.
 
 ### `scraper_runs_info`
 
@@ -229,7 +224,7 @@ Day 4 → 475,000 PLN
 
 This allows the analytical layer to identify price changes and listing lifecycle patterns.
 
-A listing disappearing from the source is treated as **no longer observed**, not automatically as a sold vehicle. The data therefore does not claim that an advert was sold unless there is independent evidence for that conclusion.
+A listing disappearing from the source is treated as **no longer observed**, not automatically as a sold vehicle. The data therefore does not claim that an advert was sold.
 
 ---
 
@@ -269,49 +264,58 @@ Visualization
 
 ---
 
-## Power BI — next stage
+## Power BI — analytical layer (MVP)
 
-The next stage of the project is to build the Power BI analytical layer.
+The first Power BI dashboard MVP has been completed. It is the first analytical interface built on top of the data collected by the Python pipeline.
 
-The dashboard will be designed around business questions rather than around the list of available columns.
+The dashboard is intended to help explore the Porsche 911 listing market from several perspectives:
 
-The first version is expected to cover areas such as:
+- **Market overview:** a high-level view of the listings currently represented in the dataset.
+- **Price analysis:** exploration of asking-price levels and their distribution.
+- **Market segmentation:** comparison of Porsche 911 listings across generations, models/versions and vehicle characteristics.
+- **Vehicle characteristics:** analysis of how model year and mileage relate to asking prices.
+- **Interactive exploration:** filtering the report to investigate specific subsets of listings rather than relying only on static totals.
 
-### Market overview
+The MVP focuses on establishing a useful analytical baseline from the available listing data. It is intentionally not presented as a finished market valuation tool or as a definitive estimate of transaction prices.
 
-- number of observed listings
-- current price levels
-- market segmentation
-- supply by model/generation
-- distribution of mileage and vehicle age
+### Analytical questions
 
-### Pricing analysis
+The first version of the report is designed to support questions such as:
 
-- median asking price
-- price distribution
-- prices by model/generation
-- price differences between configurations
-- price changes over time
+- What does the observed Porsche 911 listing market look like?
+- How are asking prices distributed?
+- How do asking prices differ across generations and versions?
+- How does model year relate to asking price?
+- How does mileage relate to asking price?
+- How does the market change when the user filters by vehicle characteristics?
 
-### Market dynamics
+These are exploratory questions. Asking prices are not the same as final transaction prices, and relationships shown in the dashboard should not automatically be interpreted as causal.
 
-- new listings
-- active listings
-- listings no longer observed
-- listing lifecycle
-- observed duration
-- price reductions
-- daily/weekly changes in supply
+### MVP scope and limitations
 
-### Listing explorer
+The current dashboard is a **first working version**, not the final Market Intelligence product.
 
-A detailed view for exploring individual Porsche 911 listings and comparing them with similar vehicles.
+- The analysis is based on collected listings.
+- The dataset represents advertised prices, not confirmed sale prices.
+- The available sample and its coverage depend on the scraper and collection period.
+- Historical snapshots are being accumulated over time; analyses of long-term market dynamics will become more meaningful as the history grows.
+- A listing that is no longer observed should not automatically be interpreted as a sold vehicle.
 
-### Comparable analysis
+The current MVP provides the foundation for extending the report with historical supply trends, price changes, listing lifecycle analysis and more advanced comparisons.
 
-A later stage may use vehicle characteristics to identify comparable listings and support more advanced pricing analysis.
+### Planned Power BI enhancements
 
-Machine learning is intentionally not the starting point. The first objective is to establish reliable historical data, a robust analytical model and meaningful business questions.
+Potential next iterations include:
+
+- market supply and listing trends over time
+- newly observed and no-longer-observed listings
+- price reductions and listing price history
+- listing lifecycle and observed time on market
+- comparisons between similar vehicles
+- more advanced analysis of configuration premiums, such as transmission or drivetrain
+- a dedicated comparable-listing analysis
+
+These are future enhancements, not features claimed to be implemented in the current MVP.
 
 ---
 
@@ -338,8 +342,8 @@ Machine learning is intentionally not the starting point. The first objective is
 The core Python layer is organized around separate responsibilities:
 
 ```text
-scraper_otomoto.py
-    └── OtomotoScraper
+scraper.py
+    └── OnlineMarketplaceScraper
         └── data acquisition and parsing
 
 data_model.py
@@ -424,8 +428,8 @@ The Porsche 911 market is used as a practical domain for developing these capabi
 
 ## Current status
 
-- [x] Otomoto light crawl
-- [x] Otomoto heavy crawl
+- [x] Light crawl
+- [x] Heavy crawl
 - [x] Data parsing and normalization
 - [x] Duplicate detection
 - [x] Advert ID consistency check
@@ -436,10 +440,10 @@ The Porsche 911 market is used as a practical domain for developing these capabi
 - [x] Scraper run logging
 - [x] SQL analytical views
 - [x] SQLite → CSV export for Power BI
-- [ ] Power BI data model
-- [ ] Power BI dashboard
-- [ ] Market segmentation analysis
-- [ ] Price and market dynamics analysis
+- [x] Power BI data model
+- [x] Power BI dashboard
+- [x] Market segmentation analysis
+- [x] Price and market dynamics analysis
 - [ ] Comparable listing analysis
 - [ ] Final documentation and portfolio presentation
 
@@ -450,7 +454,7 @@ The Porsche 911 market is used as a practical domain for developing these capabi
 The project is being developed incrementally:
 
 ### Phase 1 — Data acquisition
-Build a reliable and repeatable Otomoto scraper.
+Build a reliable and repeatable scraper.
 
 ### Phase 2 — Data storage
 Design a database capable of storing both current listing attributes and historical observations.
@@ -468,6 +472,10 @@ Build the Power BI data model and dashboard around defined market questions.
 Extend the project with comparable-vehicle analysis and potentially more advanced statistical or machine-learning approaches.
 
 ---
+
+## Current milestone
+
+The project has reached its first end-to-end milestone: automated data collection, persistence of historical observations, an SQL analytical layer and a working Power BI dashboard MVP. The next iteration will focus on improving the analytical depth rather than rebuilding the data acquisition foundation.
 
 ## Project philosophy
 

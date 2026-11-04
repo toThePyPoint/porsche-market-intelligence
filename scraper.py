@@ -15,7 +15,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-class OtomotoScraper:
+class MarketPlaceScraper:
     LAST_ITEMS_ID = "ooa-13ptg7a"
     # SHORT_DESCRIPTION_ELEMENT_ID = "e1kj25my0.ooa-nxfgg7"
     # SHORT_DESCRIPTION_ELEMENT_ID = "e3pdcj30 ooa-nxfgg7"

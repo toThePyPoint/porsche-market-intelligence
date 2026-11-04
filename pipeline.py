@@ -2,7 +2,7 @@ import datetime
 
 from data_model import SearchAdvertData, AdvertProcessingData, ScraperRunsInfo, ExchangeRate
 from listing_repository import ListingRepository
-from scraper_otomoto import OtomotoScraper
+from scraper import MarketPlaceScraper
 from exchange_rates import get_current_exchange_rate
 
 
@@ -11,8 +11,8 @@ class ListingService:
                  db_name: str = "test_db.db", export_file_prefix: str = ""):
         self.db_name = db_name
         self.repo = None
-        self.scraper = OtomotoScraper(url=url, test_mode=test_mode, pages_limit=pages_limit,
-                                      adverts_limit=adverts_limit, sorting_url_suffix=sorting_suffix)
+        self.scraper = MarketPlaceScraper(url=url, test_mode=test_mode, pages_limit=pages_limit,
+                                          adverts_limit=adverts_limit, sorting_url_suffix=sorting_suffix)
         self.export_file_prefix = export_file_prefix
 
     @staticmethod
