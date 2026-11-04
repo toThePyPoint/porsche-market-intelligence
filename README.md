@@ -291,6 +291,77 @@ The first version of the report is designed to support questions such as:
 
 These are exploratory questions. Asking prices are not the same as final transaction prices, and relationships shown in the dashboard should not automatically be interpreted as causal.
 
+### Report structure
+
+The Power BI report currently consists of four analytical pages, each addressing a different aspect of the Porsche 911 listing market.
+
+#### 1. Market Overview
+
+Provides a high-level overview of the observed Porsche 911 market.
+
+Key elements include:
+
+- KPI cards covering active listings, median asking price, most popular generation, unique listings, newly observed listings per day and observation period.
+- A world map showing the countries of origin of listed vehicles.
+- A map showing the geographical distribution of listings across Poland.
+- A box-and-whisker chart comparing asking-price distributions across generations.
+- A bar chart showing listing volume by generation.
+- A time-series chart tracking the number of active listings.
+- Interactive filters and drill-through navigation to individual generation analysis.
+
+This page answers the question: **What does the Porsche 911 listing market currently look like?**
+
+#### 2. Generation Drill Through
+
+Provides a detailed analysis of a selected Porsche 911 generation.
+
+The page includes:
+
+- KPI cards for median asking price, listing count, median mileage and median model year.
+- Model year versus median asking price.
+- Mileage versus asking price at individual-listing level.
+- Engine size versus engine power.
+- Engine power and engine size distributions.
+- Gearbox and fuel type distributions.
+- Most common engine configurations.
+- Drivetrain and body type distributions.
+
+This page focuses on understanding the technical characteristics, configuration mix and price variation within a selected generation.
+
+It answers the question: **What characterizes a particular Porsche 911 generation, and how do its specifications relate to asking prices?**
+
+#### 3. Price Dynamics
+
+Focuses on historical asking-price trends and listing price adjustments.
+
+The page includes:
+
+- A time-series chart showing median asking prices over time, with selectable date, monthly, quarterly and yearly aggregation.
+- Filters allowing analysis of individual models or the entire Porsche 911 range.
+- KPI cards summarizing price reductions, price increases and listings with unchanged prices.
+- A pie chart showing the distribution of listing price-change statuses.
+- A 100% stacked column chart showing the composition of observed listings by price-change status over time.
+- A histogram showing the distribution of price adjustments.
+
+Price-change analysis compares initial and subsequently observed listing prices. It describes asking-price adjustments rather than confirmed transaction prices.
+
+This page answers the question: **How are asking prices evolving, and how do sellers adjust their prices?**
+
+#### 4. Listing Lifecycle
+
+Analyzes how long listings remain observable in the collected market data.
+
+The page currently focuses on inactive listings and includes:
+
+- KPI cards for active listing count, median days on market and average days on market.
+- A distribution chart showing listing duration.
+- A comparison of average listing duration across generations.
+- A scatter plot comparing asking price and days on market.
+
+Listing duration is based on the period between the first and last observed snapshots. A listing disappearing from the dataset does not necessarily mean that the vehicle was sold.
+
+This page answers the question: **How long do Porsche 911 listings remain on the market, and how does listing duration vary across generations and asking prices?**
+
 ### MVP scope and limitations
 
 The current dashboard is a **first working version**, not the final Market Intelligence product.
@@ -300,22 +371,10 @@ The current dashboard is a **first working version**, not the final Market Intel
 - The available sample and its coverage depend on the scraper and collection period.
 - Historical snapshots are being accumulated over time; analyses of long-term market dynamics will become more meaningful as the history grows.
 - A listing that is no longer observed should not automatically be interpreted as a sold vehicle.
+- Listing duration represents observed time on the platform, not confirmed time to sale.
+- Price changes reflect asking-price adjustments and should not be interpreted as changes in transaction prices.
 
-The current MVP provides the foundation for extending the report with historical supply trends, price changes, listing lifecycle analysis and more advanced comparisons.
-
-### Planned Power BI enhancements
-
-Potential next iterations include:
-
-- market supply and listing trends over time
-- newly observed and no-longer-observed listings
-- price reductions and listing price history
-- listing lifecycle and observed time on market
-- comparisons between similar vehicles
-- more advanced analysis of configuration premiums, such as transmission or drivetrain
-- a dedicated comparable-listing analysis
-
-These are future enhancements, not features claimed to be implemented in the current MVP.
+The current MVP establishes a foundation for ongoing market monitoring, historical analysis and further development of Porsche 911 Market Intelligence.
 
 ---
 
@@ -444,8 +503,6 @@ The Porsche 911 market is used as a practical domain for developing these capabi
 - [x] Power BI dashboard
 - [x] Market segmentation analysis
 - [x] Price and market dynamics analysis
-- [ ] Comparable listing analysis
-- [ ] Final documentation and portfolio presentation
 
 ---
 
