@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 from dataclasses import astuple, asdict
 
-from data_model import SearchAdvertData, AdvertDetails, ScraperRunsInfo, ExchangeRate
+from .data_model import SearchAdvertData, AdvertDetails, ScraperRunsInfo, ExchangeRate
 
 
 class ListingRepository:
@@ -14,7 +14,9 @@ class ListingRepository:
 
     def __init__(self, db_name: str):
         # self.searched_listings = listings
-        self.db_name = db_name
+        self.root = Path(__file__).resolve().parent.parent
+        db_path = Path(db_name)
+        self.db_name = db_path if db_path.is_absolute() else self.root / db_path
 
     def set_connection(self):
         """Sets connection to sqlite3 database."""
@@ -119,8 +121,11 @@ class ListingRepository:
 
     def create_views(self):
         conn, cursor = self.set_connection()
+
+        views_path = self.root / "database" / "views.sql"
+
         try:
-            conn.executescript(Path("database/views.sql").read_text())
+            conn.executescript(Path(views_path).read_text())
         finally:
             conn.close()
 

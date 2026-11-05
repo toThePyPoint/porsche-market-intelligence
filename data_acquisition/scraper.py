@@ -1,17 +1,20 @@
 import datetime
 import random
 import time
+import logging
 
 import requests
 from bs4 import BeautifulSoup, Tag
-from data_model import SearchAdvertData, AdvertProcessingData, AdvertDetails
+from pathlib import Path
+from .data_model import SearchAdvertData, AdvertProcessingData, AdvertDetails
 
-import logging
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(
-    filename="logs/scraper.log",
+    filename= PROJECT_ROOT / "logs" / "scraper.log",
     level=logging.INFO
 )
 
@@ -61,7 +64,7 @@ class MarketPlaceScraper:
     def set_test_mode(self):
         """Sets class into testing mode. Testing mode gets HTML files from hard drive."""
         if self.test_mode:
-            self.first_page_url = "html-files/preview.html"
+            self.first_page_url = PROJECT_ROOT / "html-files" / "preview.html"
             self.last_page_number = 3
 
     def get_url_for_given_page_number(self, page_number: int):
@@ -75,7 +78,7 @@ class MarketPlaceScraper:
 
     @staticmethod
     def get_single_advert_test_path(advert_id):
-        return f"html-files/advert_page_{advert_id}.html"
+        return PROJECT_ROOT / f"html-files/advert_page_{advert_id}.html"
 
     def get_last_page_number(self, soup: BeautifulSoup | Tag):
         """Finds the highest pagination page number and sets self.last_page_number."""

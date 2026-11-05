@@ -1,14 +1,15 @@
 import datetime
 
-from data_model import SearchAdvertData, AdvertProcessingData, ScraperRunsInfo, ExchangeRate
-from listing_repository import ListingRepository
-from scraper import MarketPlaceScraper
-from exchange_rates import get_current_exchange_rate
+from .data_model import SearchAdvertData, AdvertProcessingData, ScraperRunsInfo, ExchangeRate
+from .listing_repository import ListingRepository
+from .scraper import MarketPlaceScraper
+from .exchange_rates import get_current_exchange_rate
+from pathlib import Path
 
 
 class ListingService:
     def __init__(self, url: str = None, sorting_suffix: str = None, test_mode: bool = False, pages_limit: int = None, adverts_limit:int = None,
-                 db_name: str = "test_db.db", export_file_prefix: str = ""):
+                 db_name: str = "data/test_db.db", export_file_prefix: str = ""):
         self.db_name = db_name
         self.repo = None
         self.scraper = MarketPlaceScraper(url=url, test_mode=test_mode, pages_limit=pages_limit,
