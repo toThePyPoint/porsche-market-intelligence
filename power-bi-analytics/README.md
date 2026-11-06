@@ -112,9 +112,7 @@ This page provides the starting point for market exploration.
 
 ### 2. Generation Drill Through
 
-<text color="secondary">[SCREENSHOT — Insert Generation Drill Through page here]</text>
-
-<text color="secondary">Suggested image: `generation-drill-through.png`</text>
+![Market Overview](./images/generation-drill-through.png)
 
 Provides a detailed analysis of a selected Porsche 911 generation.
 
@@ -152,9 +150,7 @@ The purpose of this page is to explore the relationship between vehicle specific
 
 ### 3. Price Dynamics
 
-<text color="secondary">[SCREENSHOT — Insert Price Dynamics page here]</text>
-
-<text color="secondary">Suggested image: `price-dynamics.png`</text>
+![Market Overview](./images/price-dynamics.png)
 
 Focuses on historical asking-price trends and seller price adjustments.
 
@@ -191,9 +187,7 @@ It describes seller behavior and listing price adjustments, not confirmed transa
 
 ### 4. Listing Lifecycle
 
-<text color="secondary">[SCREENSHOT — Insert Listing Lifecycle page here]</text>
-
-<text color="secondary">Suggested image: `listing-lifecycle.png`</text>
+![Market Overview](./images/listing-lifecycle.png)
 
 Analyzes how long listings remain observable in the collected market data.
 

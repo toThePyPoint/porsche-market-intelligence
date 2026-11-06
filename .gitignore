@@ -223,3 +223,4 @@ notebook-database-test.ipynb
 data
 *.db
 *.db-journal
+archive
